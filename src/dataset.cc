@@ -20,11 +20,14 @@ Dataset::Dataset(const std::string& dataroot): _dataroot(dataroot){
       y = atof(line[1].c_str());
       angle = atof(line[2].c_str());
 
-      Eigen::AngleAxisd rv(angle, Eigen::Vector3d(0, 0, 1));
-      Eigen::Quaterniond q(rv);
+      // Eigen::AngleAxisd rv(angle, Eigen::Vector3d(0, 0, 1));
+      // Eigen::Quaterniond q(rv);
 
-      Eigen::Matrix<double, 7, 1> pose;
-      pose << q.w(), q.x(), q.y(), q.z(), x, y, 0;
+      // Eigen::Matrix<double, 7, 1> pose;
+      // pose << q.w(), q.x(), q.y(), q.z(), x, y, 0;
+
+      Eigen::Vector3d pose;
+      pose << x, y, angle;
       _poses.emplace_back(pose);
     }
   }
@@ -55,7 +58,7 @@ bool Dataset::PoseIsAvailable(){
   return (_poses.size() > 0);
 }
 
-bool Dataset::GetPose(Eigen::Matrix<double, 7, 1>& pose, size_t idx){
+bool Dataset::GetPose(Eigen::Vector3d& pose, size_t idx){
   if(idx >= _poses.size()){
     return false;
   }

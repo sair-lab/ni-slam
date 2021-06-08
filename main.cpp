@@ -7,9 +7,11 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include "dataset.h"
-
+#include "edge.h"
 
 int main(int argc, char** argv){
+  google::InitGoogleLogging(argv[0]);
+
   std::string dataroot = "/media/xukuan/0000678400004823/dataset/ground_texture/uniform/1220";
   Dataset dataset(dataroot);
 
@@ -20,8 +22,11 @@ int main(int argc, char** argv){
       std::cout << "can not get image " << i << std::endl;
       break;
     }
+
     
 
-
   }
+
+
+
 };

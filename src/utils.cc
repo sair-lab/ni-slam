@@ -75,5 +75,4 @@ void ReadTxt(const std::string& file_path,
       line.clear();            // str is all whitespace
     }
   }
-
 }
