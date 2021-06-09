@@ -29,7 +29,7 @@ void Frame::GetFFTResult(Eigen::MatrixXd& fft_result){
 void Frame::SetPose(Eigen::Vector3d& pose){
   _pose = pose;
 }
-void Frame::GetPose(Eigen::Vecyor3d& pose){
+void Frame::GetPose(Eigen::Vector3d& pose){
   pose = _pose;
 }
 

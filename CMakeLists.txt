@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5.1)
 project(kcc_slam)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
@@ -24,6 +24,7 @@ find_package(OpenMP REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(FFTW3 REQUIRED)
 find_package(Ceres REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3 -march=native ")
@@ -140,13 +141,20 @@ include_directories(
   # ${catkin_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/include
   ${EIGEN3_INCLUDE_DIR}
+  ${YAML_CPP_INCLUDE_DIR}
 )
 
 # Declare a C++ library
-add_library(${PROJECT_NAME}_lib
+add_library(${PROJECT_NAME}_lib SHARED
   src/optimization_2d/pose_graph_2d.cc
   src/utils.cc
   src/dataset.cc
+  src/camera.cc
+  src/frame.cc
+  src/edge.cc
+  src/correlation_flow.cc
+  src/optimizer.cc
+  src/map.cc
 )
 
 ## Add cmake target dependencies of the library
@@ -163,6 +171,7 @@ target_link_libraries(${PROJECT_NAME}_lib
    ${OpenCV_LIBS}
    ${EIGEN3_LIBS}
    Ceres::ceres
+   ${YAML_CPP_LIBRARIES}
 )
 
 ## Declare a C++ executable

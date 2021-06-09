@@ -7,9 +7,9 @@
 #include "frame.h"
 #include "edge.h"
 #include "map.h"
+#include "utils.h"
 #include "optimization_2d/types.h"
 #include "optimization_2d/pose_graph_2d.h"
-
 
 Optimizer::Optimizer(std::shared_ptr<Map> map): _map(map){
 }
@@ -57,5 +57,10 @@ void Optimizer::OptimizeMap(){
   CHECK(ceres::optimization_2d::SolveOptimizationProblem(&problem))
       << "The solve was not successful, exiting.";
 
-  
+  AlignedMap<int, Eigen::Vector3d> frame_poses;
+  for(auto kv : poses){
+    Eigen::Vector3d frame_pose;
+    frame_pose << kv.second.x, kv.second.y, kv.second.yaw_radians;
+    frame_poses[kv.first] = frame_pose;
+  }
 }

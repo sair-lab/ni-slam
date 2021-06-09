@@ -1,5 +1,5 @@
 #ifndef FRAME_H_
-#define FRAME_H
+#define FRAME_H_
 
 #include <string>
 #include <Eigen/Dense>
@@ -16,7 +16,7 @@ public:
   void SetFFTResult(Eigen::MatrixXd& fft_result);
   void GetFFTResult(Eigen::MatrixXd& fft_result);
   void SetPose(Eigen::Vector3d& pose);
-  void GetPose(Eigen::Vecyor3d& pose);
+  void GetPose(Eigen::Vector3d& pose);
   void AddEdge(int edge_id);
   void GetEdgeIds(std::vector<int>& edge_ids);
   void SaveToDisk(const std::string root_dir);

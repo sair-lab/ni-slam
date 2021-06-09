@@ -38,3 +38,11 @@ void Map::GetAllEdges(std::vector<Edge>& edges){
     edges.emplace_back(kv.second);
   }
 }
+
+void Map::UpdatePoses(AlignedMap<int, Eigen::Vector3d> frame_poses){
+  for(auto kv : frame_poses){
+    if(_frames.count(kv.first) > 0){
+      _frames[kv.first].SetPose(kv.second);
+    }
+  }
+}
