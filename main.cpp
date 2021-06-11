@@ -85,7 +85,6 @@ int main(int argc, char** argv){
       pose = last_pose + relative_pose;
     }
     frame->SetPose(pose);
-    std::cout << "pose = " << pose << std::endl;
 
     // 7. add edges between last frame and currect frame to map
     int last_frame_id = last_frame->GetFrameId();
