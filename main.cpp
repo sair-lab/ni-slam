@@ -13,6 +13,7 @@
 #include "camera.h"
 #include "correlation_flow.h"
 #include "map.h"
+#include "optimizer.h"
 
 int main(int argc, char** argv){
   google::InitGoogleLogging(argv[0]);
@@ -25,7 +26,7 @@ int main(int argc, char** argv){
   Camera camera(dataset_config.camera_file);
 
   CFConfig cf_config = configs.cf_config;
-  CorrelationFlow correlation_flow;
+  CorrelationFlow correlation_flow(cf_config);
 
   std::shared_ptr<Map> map = std::make_shared<Map>();
   Optimizer optimizer(map);

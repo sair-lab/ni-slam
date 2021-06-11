@@ -6,6 +6,6 @@
 class CorrelationFlow{
 public:
   CorrelationFlow(CFConfig& cf_config);
-}
+};
 
 #endif  // CORRELATION_FLOW_H

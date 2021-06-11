@@ -50,7 +50,7 @@ bool Dataset::GetImage(cv::Mat& image, size_t idx){
 
   std::string image_name = _image_names[idx];
   std::string image_path = ConcatenateFolderAndFileName(_image_dir, image_name);
-  image = cv::imread(image_path, CV_LOAD_IMAGE_GRAYSCALE);
+  image = cv::imread(image_path, cv::ImreadModes::IMREAD_GRAYSCALE);
   return true;
 }
 

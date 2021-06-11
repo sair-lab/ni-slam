@@ -47,3 +47,6 @@ qtcreator-*
 CATKIN_IGNORE
 bag
 bag
+
+.vscode/*
+log/*
