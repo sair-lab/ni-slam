@@ -47,7 +47,7 @@ int main(int argc, char** argv){
 
     // 2. compute fft result
     Eigen::ArrayXXf image_array;
-    ConvertMatToArray(image, image_array);
+    ConvertMatToNormalizedArray(image, image_array);
 
     Eigen::ArrayXXcf fft_result = correlation_flow.FFT(image_array);
 

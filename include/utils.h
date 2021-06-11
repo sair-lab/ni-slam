@@ -56,6 +56,6 @@ void ReadTxt(const std::string& file_path,
     std::vector<std::vector<std::string> >& lines, std::string seq);
 
 // Eigen::ArrayXXf& GenerateDepth(float height);
-void ConvertMatToArray(cv::Mat& image, Eigen::ArrayXXf& array);
+void ConvertMatToNormalizedArray(cv::Mat& image, Eigen::ArrayXXf& array);
 
 #endif  // UTILS_H_
