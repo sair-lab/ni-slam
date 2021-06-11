@@ -33,7 +33,6 @@ int main(int argc, char** argv){
 
   bool init = false;
   Frame last_frame;
-  cv::Mat last_image = cv::Mat();
   size_t dataset_length = dataset.GetDatasetLength();
   for(size_t i = 0; i < dataset_length; ++i){
     // std::cout << "i = " << i << std::endl;
