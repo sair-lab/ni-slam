@@ -50,7 +50,7 @@ Camera& Camera::operator=(const Camera& camera){
 }
 
 void Camera::UndistortImage(cv::Mat& image, cv::Mat& undistort_image){
-  remap(image, undistort_image, _map1, _map2, CV_INTER_LINEAR);
+  remap(image, undistort_image, _map1, _map2, cv::INTER_LINEAR);
 }
 
 void Camera::GetNewCameraMatrix(cv::Mat& camera_matrix){
