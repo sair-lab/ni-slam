@@ -6,7 +6,7 @@ Frame::Frame(){
 Frame::Frame(int frame_id): _frame_id(frame_id){
 }
 
-Frame::Frame(int frame_id, Eigen::ArrayXXf& fft_result):
+Frame::Frame(int frame_id, Eigen::ArrayXXcf& fft_result):
     _frame_id(frame_id), _fft_result(fft_result){
 }
 
@@ -26,22 +26,22 @@ int Frame::GetFrameId(){
   return _frame_id;
 }
 
-void Frame::SetFFTResult(Eigen::ArrayXXf& fft_result){
+void Frame::SetFFTResult(Eigen::ArrayXXcf& fft_result){
   _fft_result = fft_result;
 }
 
-void Frame::SetFFTResult(Eigen::ArrayXXf& fft_result, 
-    Eigen::ArrayXXf& depth_fft_result){
+void Frame::SetFFTResult(Eigen::ArrayXXcf& fft_result,
+    Eigen::ArrayXXcf& depth_fft_result){
   _fft_result = fft_result;
   _depth_fft_result = depth_fft_result;
 }
 
-void Frame::GetFFTResult(Eigen::ArrayXXf& fft_result){
+void Frame::GetFFTResult(Eigen::ArrayXXcf& fft_result){
   fft_result = _fft_result;
 }
 
-void Frame::GetFFTResult(Eigen::ArrayXXf& fft_result, 
-    Eigen::ArrayXXf& depth_fft_result){
+void Frame::GetFFTResult(Eigen::ArrayXXcf& fft_result,
+    Eigen::ArrayXXcf& depth_fft_result){
   fft_result = _fft_result;
   depth_fft_result = _depth_fft_result;
 }

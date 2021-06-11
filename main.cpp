@@ -49,7 +49,7 @@ int main(int argc, char** argv){
     Eigen::ArrayXXf image_array;
     ConvertMatToArray(image, image_array);
 
-    Eigen::ArrayXXf fft_result;
+    Eigen::ArrayXXcf fft_result;
     correlation_flow.FFT(image_array, fft_result);
     
     // 3. construct frame
@@ -71,7 +71,7 @@ int main(int argc, char** argv){
 
     // 5. tracking, compute relative pose
     Eigen::Vector3d relative_pose;
-    Eigen::ArrayXXf last_fft_result;
+    Eigen::ArrayXXcf last_fft_result;
     last_frame->GetFFTResult(last_fft_result);
     correlation_flow.ComputePose(last_fft_result, fft_result, relative_pose);
 
