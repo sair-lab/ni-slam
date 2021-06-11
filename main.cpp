@@ -49,9 +49,8 @@ int main(int argc, char** argv){
     Eigen::ArrayXXf image_array;
     ConvertMatToArray(image, image_array);
 
-    Eigen::ArrayXXcf fft_result;
-    correlation_flow.FFT(image_array, fft_result);
-    
+    Eigen::ArrayXXcf fft_result = correlation_flow.FFT(image_array);
+
     // 3. construct frame
     FramePtr frame(new Frame(i, fft_result));
 

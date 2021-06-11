@@ -7,8 +7,9 @@
 class CorrelationFlow{
 public:
   CorrelationFlow(CFConfig& cf_config);
-  void FFT(Eigen::ArrayXXf& image, Eigen::ArrayXXcf& fft_result);
-  void ComputePose(Eigen::ArrayXXcf& last_fft_result, Eigen::ArrayXXcf& fft_result, Eigen::Vector3d& pose);
+  Eigen::ArrayXXcf FFT(Eigen::ArrayXXf&);
+  Eigen::ArrayXXf IFFT(Eigen::ArrayXXcf&);
+  void ComputePose(Eigen::ArrayXXcf&, Eigen::ArrayXXcf&, Eigen::Vector3d&);
 };
 
 #endif  // CORRELATION_FLOW_H
