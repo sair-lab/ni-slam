@@ -16,7 +16,9 @@
 #include <utility>
 #include <Eigen/Core>
 #include <Eigen/StdVector>
-
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/opencv.hpp>
 
 template <template <typename, typename> class Container, typename Type>
 using Aligned = Container<Type, Eigen::aligned_allocator<Type>>;
@@ -52,5 +54,8 @@ std::string ConcatenateFolderAndFileName(
 
 void ReadTxt(const std::string& file_path, 
     std::vector<std::vector<std::string> >& lines, std::string seq);
+
+// Eigen::ArrayXXf& GenerateDepth(float height);
+void ConvertMatToArray(cv::Mat& image, Eigen::ArrayXXf& array);
 
 #endif  // UTILS_H_

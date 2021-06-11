@@ -6,8 +6,16 @@ Frame::Frame(){
 Frame::Frame(int frame_id): _frame_id(frame_id){
 }
 
-Frame::Frame(int frame_id, Eigen::MatrixXd& fft_result, Eigen::Vector3d& pose):
+Frame::Frame(int frame_id, Eigen::ArrayXXf& fft_result, Eigen::Vector3d& pose):
     _frame_id(frame_id), _fft_result(fft_result), _pose(pose){
+}
+
+Frame& Frame::operator=(const Frame& other){
+  _frame_id = other._frame_id;
+  _fft_result = other._fft_result;
+  _pose = other._pose;
+  _edge_ids = other._edge_ids;
+  return *this;
 }
 
 void Frame::SetFrameId(int frame_id){
@@ -18,11 +26,11 @@ int Frame::GetFrameId(){
   return _frame_id;
 }
 
-void Frame::SetFFTResult(Eigen::MatrixXd& fft_result){
+void Frame::SetFFTResult(Eigen::ArrayXXf& fft_result){
   _fft_result = fft_result;
 }
 
-void Frame::GetFFTResult(Eigen::MatrixXd& fft_result){
+void Frame::GetFFTResult(Eigen::ArrayXXf& fft_result){
   fft_result = _fft_result;
 }
 

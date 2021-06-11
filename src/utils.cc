@@ -1,4 +1,5 @@
 #include "utils.h"
+#include <opencv2/core/eigen.hpp>
 
 bool FileExists(const std::string& file) {
   struct stat file_status;
@@ -75,4 +76,14 @@ void ReadTxt(const std::string& file_path,
       line.clear();            // str is all whitespace
     }
   }
+}
+
+// Eigen::ArrayXXf& GenerateDepth(float height){
+
+// }
+
+void ConvertMatToArray(cv::Mat& image, Eigen::ArrayXXf& array){
+  Eigen::MatrixXf matrix;
+  cv::cv2eigen(image, matrix);
+  array = matrix.array();
 }
