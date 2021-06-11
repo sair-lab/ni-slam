@@ -35,7 +35,6 @@ int main(int argc, char** argv){
   Frame last_frame;
   size_t dataset_length = dataset.GetDatasetLength();
   for(size_t i = 0; i < dataset_length; ++i){
-    // std::cout << "i = " << i << std::endl;
     cv::Mat image, undistort_image;
     if(!dataset.GetImage(image, i)){
       std::cout << "can not get image " << i << std::endl;
@@ -45,13 +44,12 @@ int main(int argc, char** argv){
     dataset.GetPose(pose, i);
     camera.UndistortImage(image, undistort_image);
 
-    // Eigen::ArrayXXf image_array = Eigen::Map<Eigen::ArrayXXf>(
-    //     &undistort_image.at<float>(0,0), undistort_image.cols, undistort_image.rows);
     Eigen::ArrayXXf image_array;
     ConvertMatToArray(image, image_array);
 
     Eigen::ArrayXXf fft_result;
     correlation_flow.FFT(image_array, fft_result);
+    
     Frame frame(i, fft_result, pose);
     if(!init){
       last_frame = frame;
