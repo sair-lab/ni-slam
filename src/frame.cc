@@ -6,8 +6,8 @@ Frame::Frame(){
 Frame::Frame(int frame_id): _frame_id(frame_id){
 }
 
-Frame::Frame(int frame_id, Eigen::ArrayXXf& fft_result, Eigen::Vector3d& pose):
-    _frame_id(frame_id), _fft_result(fft_result), _pose(pose){
+Frame::Frame(int frame_id, Eigen::ArrayXXf& fft_result):
+    _frame_id(frame_id), _fft_result(fft_result){
 }
 
 Frame& Frame::operator=(const Frame& other){
@@ -30,8 +30,20 @@ void Frame::SetFFTResult(Eigen::ArrayXXf& fft_result){
   _fft_result = fft_result;
 }
 
+void Frame::SetFFTResult(Eigen::ArrayXXf& fft_result, 
+    Eigen::ArrayXXf& depth_fft_result){
+  _fft_result = fft_result;
+  _depth_fft_result = depth_fft_result;
+}
+
 void Frame::GetFFTResult(Eigen::ArrayXXf& fft_result){
   fft_result = _fft_result;
+}
+
+void Frame::GetFFTResult(Eigen::ArrayXXf& fft_result, 
+    Eigen::ArrayXXf& depth_fft_result){
+  fft_result = _fft_result;
+  depth_fft_result = _depth_fft_result;
 }
 
 void Frame::SetPose(Eigen::Vector3d& pose){

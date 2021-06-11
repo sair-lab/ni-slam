@@ -5,6 +5,8 @@
 #include <Eigen/Dense>
 #include <Eigen/SparseCore>
 
+#include "utils.h"
+
 struct Edge{
   enum Type {
     Odom = 0,
@@ -23,5 +25,6 @@ struct Edge{
   Edge(int edge_id, Type type, int from, int to, Eigen::Vector3d& T, Eigen::Matrix3d& information);
 };
 
+typedef std::shared_ptr<Edge> EdgePtr;
 
 #endif  // EDGE_H_
