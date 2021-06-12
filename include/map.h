@@ -28,9 +28,9 @@ struct GridLocation{
 };
 
 struct GridLocationHash{
-	std::size_t operator() (const GridLocation& loc) const{
-		return std::hash<int>()(loc.x) ^ std::hash<int>()(loc.y);
-	}
+  std::size_t operator() (const GridLocation& loc) const{
+    return std::hash<int>()(loc.x) ^ std::hash<int>()(loc.y);
+  }
 };
 
 struct GridLocationEqual{
