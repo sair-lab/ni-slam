@@ -82,8 +82,8 @@ void ReadTxt(const std::string& file_path,
 
 // }
 
-void ConvertMatToArray(cv::Mat& image, Eigen::ArrayXXf& array){
+void ConvertMatToNormalizedArray(cv::Mat& image, Eigen::ArrayXXf& array){
   Eigen::MatrixXf matrix;
   cv::cv2eigen(image, matrix);
-  array = matrix.array();
+  array = matrix.array()/255.0;
 }
