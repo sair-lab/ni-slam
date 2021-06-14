@@ -44,7 +44,10 @@ float CorrelationFlow::ComputePose(const Eigen::ArrayXXcf& last_fft_result, cons
 {
     Eigen::Vector2d trans, rots;
     auto var_trans = EstimateTrans(last_fft_result, fft_result, trans);
-    auto var_rots = EstimateTrans(last_fft_result, fft_polar, rots);
+    auto var_rots = EstimateTrans(last_fft_polar, fft_polar, rots);
+    pose[0] = trans[0];
+    pose[1] = trans[1];
+    pose[2] = rots[0];
 }
 
 float CorrelationFlow::EstimateTrans(const Eigen::ArrayXXcf& last_fft_result, const Eigen::ArrayXXcf& fft_result, Eigen::Vector2d& trans)
