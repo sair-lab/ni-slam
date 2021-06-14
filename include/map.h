@@ -52,11 +52,18 @@ public:
   void GetAllEdges(std::vector<EdgePtr>& edges);
 
   void UpdatePoses(AlignedMap<int, Eigen::Vector3d> frame_poses);
+
+  GridLocation ComputeGridLocation(double x, double, y);
+  GridLocation ComputeGridLocation(Eigen::Vector3d pose);
+  int GetFramesInGrids(std::vector<FramePtr>& frames, std::vector<GridLocation>& grid_locations);
+
 private:
   std::map<int, FramePtr> _frames;
   std::map<int, EdgePtr> _edges;
-  float _grid_scale;
+  double _grid_scale;
   GridMap _grid_map;
 };
+
+typedef std::shared_ptr<Map> MapPtr;
 
 #endif  // MAP_H_
