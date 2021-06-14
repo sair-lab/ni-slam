@@ -13,6 +13,7 @@
 #include "camera.h"
 #include "correlation_flow.h"
 #include "map.h"
+#include "loop_closure.h"
 #include "optimizer.h"
 
 int main(int argc, char** argv){
@@ -26,9 +27,10 @@ int main(int argc, char** argv){
   Camera camera(dataset_config.camera_file);
 
   CFConfig cf_config = configs.cf_config;
-  CorrelationFlow correlation_flow(cf_config);
+  CorrelationFlowPtr correlation_flow(new CorrelationFlow(cf_config));
 
-  std::shared_ptr<Map> map = std::make_shared<Map>();
+  MapPtr map = std::make_shared<Map>();
+  LoopClosure loop_closure(1.0, correlation_flow, map);
   Optimizer optimizer(map);
 
   bool init = false;
@@ -36,6 +38,7 @@ int main(int argc, char** argv){
   int edge_id = 0;
   size_t dataset_length = dataset.GetDatasetLength();
   const bool OdomPoseIsAvailable = dataset.PoseIsAvailable();
+  std::vector<LoopClosureResult> loop_matches;
   for(size_t i = 0; i < dataset_length; ++i){
     // 1. read image and undistort
     cv::Mat image, undistort_image;
@@ -49,7 +52,7 @@ int main(int argc, char** argv){
     Eigen::ArrayXXf image_array;
     ConvertMatToNormalizedArray(image, image_array);
 
-    Eigen::ArrayXXcf fft_result = correlation_flow.FFT(image_array);
+    Eigen::ArrayXXcf fft_result = correlation_flow->FFT(image_array);
 
     // 3. construct frame
     FramePtr frame(new Frame(i, fft_result));
@@ -72,7 +75,7 @@ int main(int argc, char** argv){
     Eigen::Vector3d relative_pose;
     Eigen::ArrayXXcf last_fft_result;
     last_frame->GetFFTResult(last_fft_result);
-    correlation_flow.ComputePose(last_fft_result, fft_result, relative_pose);
+    correlation_flow->ComputePose(last_fft_result, fft_result, relative_pose);
 
     // 6. set pose of current frame
     Eigen::Vector3d pose;
@@ -114,11 +117,20 @@ int main(int argc, char** argv){
       map->AddEdge(cf_edge);
     }
 
-    // find loop closure
-    
+    // 8. find loop closure
+    LoopClosureResult loop_closure_result = loop_closure.FindLoopClosure(frame, pose);
+    if(loop_closure_result.found){
+      loop_matches.emplace_back(loop_closure_result);
+    }else{
+      loop_matches.clear();
+    }
 
+    // 9. if find loop, optimize map
+    if(loop_matches.size() >= 3){
+      optimizer.OptimizeMap();
+    }
 
-    // n. update last_frame
+    // 10. update last_frame
     last_frame = frame;
   }
 

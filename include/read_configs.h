@@ -19,10 +19,8 @@ struct CFConfig{
 };
 
 struct LoopClosureConfig{
-  double position_threshold;
-  double angle_threshold;
   double response_threshold;
-}
+};
 
 struct Configs{
   DatasetConfig dataset_config;

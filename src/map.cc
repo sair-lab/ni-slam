@@ -35,16 +35,18 @@ void Map::AddEdge(EdgePtr& edge){
   }
 }
 
-void Map::GetAllFrames(std::vector<FramePtr>& frames){
+int Map::GetAllFrames(std::vector<FramePtr>& frames){
   for(auto kv : _frames){
     frames.emplace_back(kv.second);
   }
+  return frames.size();
 }
 
-void Map::GetAllEdges(std::vector<EdgePtr>& edges){
+int Map::GetAllEdges(std::vector<EdgePtr>& edges){
   for(auto kv : _edges){
     edges.emplace_back(kv.second);
   }
+  return edges.size();
 }
 
 void Map::UpdatePoses(AlignedMap<int, Eigen::Vector3d> frame_poses){
@@ -55,10 +57,10 @@ void Map::UpdatePoses(AlignedMap<int, Eigen::Vector3d> frame_poses){
   }
 }
 
-GridLocation Map::ComputeGridLocation(double x, double, y){
+GridLocation Map::ComputeGridLocation(double x, double y){
   int grid_x = static_cast<int>((x / _grid_scale));
   int grid_y = static_cast<int>((y / _grid_scale));
-  return grid_location(grid_x, grid_y);
+  return GridLocation(grid_x, grid_y);
 }
 
 GridLocation Map::ComputeGridLocation(Eigen::Vector3d pose){
