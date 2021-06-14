@@ -28,9 +28,9 @@ struct GridLocation{
 };
 
 struct GridLocationHash{
-	std::size_t operator() (const GridLocation& loc) const{
-		return std::hash<int>()(loc.x) ^ std::hash<int>()(loc.y);
-	}
+  std::size_t operator() (const GridLocation& loc) const{
+    return std::hash<int>()(loc.x) ^ std::hash<int>()(loc.y);
+  }
 };
 
 struct GridLocationEqual{
@@ -45,18 +45,27 @@ typedef std::unordered_map<GridLocation, FrameSet, GridLocationHash, GridLocatio
 class Map{
 public:
   Map();
+  Map(double grid_scale);
+
   void AddFrame(FramePtr& frame);
   void AddEdge(EdgePtr& edge);
   
-  void GetAllFrames(std::vector<FramePtr>& frames);
-  void GetAllEdges(std::vector<EdgePtr>& edges);
+  int GetAllFrames(std::vector<FramePtr>& frames);
+  int GetAllEdges(std::vector<EdgePtr>& edges);
 
   void UpdatePoses(AlignedMap<int, Eigen::Vector3d> frame_poses);
+
+  GridLocation ComputeGridLocation(double x, double y);
+  GridLocation ComputeGridLocation(Eigen::Vector3d pose);
+  int GetFramesInGrids(std::vector<FramePtr>& frames, std::vector<GridLocation>& grid_locations);
+
 private:
   std::map<int, FramePtr> _frames;
   std::map<int, EdgePtr> _edges;
-  float _grid_scale;
+  double _grid_scale;
   GridMap _grid_map;
 };
+
+typedef std::shared_ptr<Map> MapPtr;
 
 #endif  // MAP_H_

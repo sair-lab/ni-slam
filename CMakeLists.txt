@@ -153,6 +153,7 @@ add_library(${PROJECT_NAME}_lib SHARED
   src/frame.cc
   src/edge.cc
   src/correlation_flow.cc
+  src/loop_closure.cc
   src/optimizer.cc
   src/map.cc
 )

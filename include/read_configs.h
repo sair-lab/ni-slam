@@ -18,6 +18,10 @@ struct CFConfig{
   float lambda;
 };
 
+struct LoopClosureConfig{
+  double response_threshold;
+};
+
 struct Configs{
   DatasetConfig dataset_config;
   CFConfig cf_config;

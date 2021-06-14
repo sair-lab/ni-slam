@@ -37,7 +37,7 @@ Eigen::ArrayXXf CorrelationFlow::IFFT(Eigen::ArrayXXcf& xf){
 }
 
 
-void CorrelationFlow::ComputePose(Eigen::ArrayXXcf& last_fft_result, Eigen::ArrayXXcf& fft_result, Eigen::Vector3d& pose){
+float CorrelationFlow::ComputePose(Eigen::ArrayXXcf& last_fft_result, Eigen::ArrayXXcf& fft_result, Eigen::Vector3d& pose){
 
     auto Kzz = gaussian_kernel(last_fft_result);
     auto Kxz = gaussian_kernel(fft_result, last_fft_result);
@@ -50,6 +50,7 @@ void CorrelationFlow::ComputePose(Eigen::ArrayXXcf& last_fft_result, Eigen::Arra
     pose[1] = -(max_index[1]-cfg.height/2);
     pose[2] = 0;
     std::cout<<"pose: "<<pose.transpose()<<std::endl;
+    return max_response;
 }
 
 

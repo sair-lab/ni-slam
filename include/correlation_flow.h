@@ -10,7 +10,7 @@ class CorrelationFlow{
 public:
     CorrelationFlow(CFConfig& cf_config);
     Eigen::ArrayXXcf FFT(Eigen::ArrayXXf&);
-    void ComputePose(Eigen::ArrayXXcf&, Eigen::ArrayXXcf&, Eigen::Vector3d&);
+    float ComputePose(Eigen::ArrayXXcf&, Eigen::ArrayXXcf&, Eigen::Vector3d&);
 
 private:
     CFConfig cfg;
@@ -21,5 +21,7 @@ private:
     inline Eigen::ArrayXXcf gaussian_kernel(const Eigen::ArrayXXcf&, const Eigen::ArrayXXcf&);
     inline Eigen::ArrayXXf polar(const Eigen::ArrayXXf&);
 };
+
+typedef std::shared_ptr<CorrelationFlow> CorrelationFlowPtr;
 
 #endif  // CORRELATION_FLOW_H
