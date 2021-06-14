@@ -2,6 +2,7 @@
 #define CORRELATION_FLOW_H
 
 #include <fftw3.h>
+#include "utils.h"
 #include "read_configs.h"
 
 class CorrelationFlow{
@@ -18,6 +19,7 @@ private:
     Eigen::ArrayXXf IFFT(Eigen::ArrayXXcf&);
     inline Eigen::ArrayXXcf gaussian_kernel(const Eigen::ArrayXXcf&);
     inline Eigen::ArrayXXcf gaussian_kernel(const Eigen::ArrayXXcf&, const Eigen::ArrayXXcf&);
+    inline Eigen::ArrayXXf polar(const Eigen::ArrayXXf&);
 };
 
 #endif  // CORRELATION_FLOW_H

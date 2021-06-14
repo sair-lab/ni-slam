@@ -46,10 +46,8 @@ void CorrelationFlow::ComputePose(Eigen::ArrayXXcf& last_fft_result, Eigen::Arra
     Eigen::ArrayXXf g = IFFT(G);
     Eigen::ArrayXXf::Index max_index[2];
     auto max_response = g.maxCoeff(&(max_index[0]), &(max_index[1]));
-    float vx = -(max_index[0]-cfg.width/2);
-    float vy = -(max_index[1]-cfg.height/2);
-    pose[0] = vx;
-    pose[1] = vy;
+    pose[0] = -(max_index[0]-cfg.width/2);
+    pose[1] = -(max_index[1]-cfg.height/2);
     pose[2] = 0;
     std::cout<<"pose: "<<pose.transpose()<<std::endl;
 }
@@ -79,4 +77,13 @@ inline Eigen::ArrayXXcf CorrelationFlow::gaussian_kernel(const Eigen::ArrayXXcf&
     auto xxzz = (xx+xx-2*xz)/N;
     Eigen::ArrayXXf kernel = (-1/(cfg.sigma*cfg.sigma)*xxzz).exp();
     return FFT(kernel);
+}
+
+inline Eigen::ArrayXXf CorrelationFlow::polar(const Eigen::ArrayXXf& array)
+{
+    cv::Mat polar_img, img=ConvertArrayToMat(array);
+    cv::Point2f center((float)img.cols/2, (float)img.rows/2);
+    double radius = (double)sqrt((img.rows/2)*(img.rows/2)+(img.cols/2)*(img.cols/2));
+    cv::linearPolar(img, polar_img, center, radius, cv::INTER_LINEAR + cv::WARP_FILL_OUTLIERS);
+    return ConvertMatToArray(polar_img);
 }

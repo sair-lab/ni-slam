@@ -87,3 +87,15 @@ void ConvertMatToNormalizedArray(cv::Mat& image, Eigen::ArrayXXf& array){
   cv::cv2eigen(image, matrix);
   array = matrix.array()/255.0;
 }
+
+Eigen::ArrayXXf ConvertMatToArray(const cv::Mat& image){
+  Eigen::MatrixXf matrix;
+  cv::cv2eigen(image, matrix);
+  return matrix.array();
+}
+
+cv::Mat ConvertArrayToMat(const Eigen::MatrixXf& array){
+  cv::Mat image;
+  cv::eigen2cv(array, image);
+  return image;
+}

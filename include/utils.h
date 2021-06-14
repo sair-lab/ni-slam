@@ -58,4 +58,8 @@ void ReadTxt(const std::string& file_path,
 // Eigen::ArrayXXf& GenerateDepth(float height);
 void ConvertMatToNormalizedArray(cv::Mat& image, Eigen::ArrayXXf& array);
 
+Eigen::ArrayXXf ConvertMatToArray(const cv::Mat&);
+
+cv::Mat ConvertArrayToMat(const Eigen::ArrayXXf&);
+
 #endif  // UTILS_H_
