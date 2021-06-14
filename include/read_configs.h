@@ -12,7 +12,10 @@ struct DatasetConfig{
 };
 
 struct CFConfig{
-  int test;
+  int width;
+  int height;
+  float sigma;
+  float lambda;
 };
 
 struct LoopClosureConfig{
@@ -37,7 +40,10 @@ struct Configs{
     dataset_config.camera_file = dataset_node["camera_config"].as<std::string>();
 
     YAML::Node cf_node = file_node["correlation_flow"];
-    cf_config.test = cf_node["test"].as<int>();
+    cf_config.width = cf_node["width"].as<int>();
+    cf_config.height = cf_node["height"].as<int>();
+    cf_config.sigma = cf_node["sigma"].as<float>();
+    cf_config.lambda = cf_node["lambda"].as<float>();
   }
 };
 

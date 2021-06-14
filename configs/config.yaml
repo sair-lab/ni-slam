@@ -1,6 +1,9 @@
 dataset:
-  dataroot: "/media/xukuan/0000678400004823/dataset/ground_texture/uniform/1220"
-  camera_config: "/media/xukuan/0000678400004823/dataset/ground_texture/uniform/1220/camera.yaml"
+  dataroot: "/data/datasets/ground_texture/mini"
+  camera_config: "/data/datasets/ground_texture/mini/camera.yaml"
 
 correlation_flow:
-  test: 1
+  width: 448
+  height: 448
+  sigma: 0.2 # For Gaussian Kernel
+  lambda: 0.1 # For regularization
