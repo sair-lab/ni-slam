@@ -9,16 +9,18 @@ class CorrelationFlow{
 
 public:
     CorrelationFlow(CFConfig& cf_config);
-    Eigen::ArrayXXcf FFT(Eigen::ArrayXXf&);
-    float ComputePose(Eigen::ArrayXXcf&, Eigen::ArrayXXcf&, Eigen::Vector3d&);
+    void ComputeIntermedium(const Eigen::ArrayXXf&, Eigen::ArrayXXcf&, Eigen::ArrayXXcf&);
+    float ComputePose(const Eigen::ArrayXXcf&, const Eigen::ArrayXXcf&, const Eigen::ArrayXXcf&, const Eigen::ArrayXXcf&, Eigen::Vector3d&);
 
 private:
     CFConfig cfg;
     Eigen::ArrayXXcf target_fft;
     Eigen::ArrayXXcf filter_fft;
-    Eigen::ArrayXXf IFFT(Eigen::ArrayXXcf&);
+    Eigen::ArrayXXcf FFT(const Eigen::ArrayXXf&);
+    Eigen::ArrayXXf IFFT(const Eigen::ArrayXXcf&);
     inline Eigen::ArrayXXcf gaussian_kernel(const Eigen::ArrayXXcf&);
     inline Eigen::ArrayXXcf gaussian_kernel(const Eigen::ArrayXXcf&, const Eigen::ArrayXXcf&);
+    float EstimateTrans(const Eigen::ArrayXXcf&, const Eigen::ArrayXXcf&, Eigen::Vector2d&);
     inline Eigen::ArrayXXf polar(const Eigen::ArrayXXf&);
 };
 

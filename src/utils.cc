@@ -94,8 +94,9 @@ Eigen::ArrayXXf ConvertMatToArray(const cv::Mat& image){
   return matrix.array();
 }
 
-cv::Mat ConvertArrayToMat(const Eigen::MatrixXf& array){
+cv::Mat ConvertArrayToMat(const Eigen::ArrayXXf& array){
   cv::Mat image;
-  cv::eigen2cv(array, image);
+  Eigen::MatrixXf matrix(array);
+  cv::eigen2cv(matrix, image);
   return image;
 }

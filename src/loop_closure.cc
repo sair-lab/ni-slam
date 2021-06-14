@@ -30,16 +30,16 @@ LoopClosureResult LoopClosure::FindLoopClosure(FramePtr& current_frame, Eigen::V
 }
 
 LoopClosureResult LoopClosure::FindLoopClosure(FramePtr& current_frame, std::vector<FramePtr>& frames){
-  Eigen::ArrayXXcf current_fft_result;
-  current_frame->GetFFTResult(current_fft_result);
+  Eigen::ArrayXXcf current_fft_result, current_fft_polar;
+  current_frame->GetFFTResult(current_fft_result, current_fft_polar);
 
   LoopClosureResult result;
   result.current_frame = current_frame;
   for(FramePtr frame : frames){
-    Eigen::ArrayXXcf fft_result;
-    frame->GetFFTResult(fft_result);
+    Eigen::ArrayXXcf fft_result, fft_polar;
+    frame->GetFFTResult(fft_result, fft_polar);
     Eigen::Vector3d relative_pose;
-    float response = _correlation_flow->ComputePose(current_fft_result, fft_result, relative_pose);
+    float response = _correlation_flow->ComputePose(fft_result, current_fft_result, fft_polar, current_fft_polar, relative_pose);
     if(response > result.response){
       result.response = response;
       result.loop_frame = frame;

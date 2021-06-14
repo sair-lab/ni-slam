@@ -11,11 +11,12 @@ class Frame{
 public:
   Frame();
   Frame(int frame_id);
-  Frame(int frame_id, Eigen::ArrayXXcf& fft_result);
+  Frame(int frame_id, Eigen::ArrayXXf&, Eigen::ArrayXXcf&, Eigen::ArrayXXcf&);
   Frame& operator=(const Frame& other);
 
   void SetFrameId(int frame_id);
   int GetFrameId();
+  Eigen::ArrayXXf GetFrame();
   void SetFFTResult(Eigen::ArrayXXcf& fft_result);
   void SetFFTResult(Eigen::ArrayXXcf& fft_result, Eigen::ArrayXXcf& depth_fft_result);
   void GetFFTResult(Eigen::ArrayXXcf& fft_result);
@@ -28,7 +29,9 @@ public:
 
 private:
   int _frame_id;
+  Eigen::ArrayXXf _frame;
   Eigen::ArrayXXcf _fft_result;
+  Eigen::ArrayXXcf _fft_polar;
   Eigen::ArrayXXcf _depth_fft_result;
   Eigen::Vector3d _pose;
   std::vector<int> _edge_ids;

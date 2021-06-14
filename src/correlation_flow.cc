@@ -1,7 +1,8 @@
 #include "correlation_flow.h"
 #include "read_configs.h"
 
-CorrelationFlow::CorrelationFlow(CFConfig& cf_config){
+CorrelationFlow::CorrelationFlow(CFConfig& cf_config)
+{
     cfg = cf_config;
     Eigen::ArrayXXf target = Eigen::ArrayXXf::Zero(cfg.width, cfg.height);
     target(cfg.width/2, cfg.height/2) = 1;
@@ -10,35 +11,44 @@ CorrelationFlow::CorrelationFlow(CFConfig& cf_config){
     filter_fft = FFT(zero);
 }
 
-Eigen::ArrayXXcf CorrelationFlow::FFT(Eigen::ArrayXXf& x){
+Eigen::ArrayXXcf CorrelationFlow::FFT(const Eigen::ArrayXXf& x)
+{
 
     Eigen::ArrayXXcf xf = Eigen::ArrayXXcf(x.rows()/2+1, x.cols());
-
     fftwf_plan fft_plan = fftwf_plan_dft_r2c_2d(x.cols(), x.rows(), (float(*))(x.data()),
         (float(*)[2])(xf.data()), FFTW_ESTIMATE); // reverse order for column major
-
     fftwf_execute(fft_plan);
-
     return xf;
 }
 
-Eigen::ArrayXXf CorrelationFlow::IFFT(Eigen::ArrayXXcf& xf){
+Eigen::ArrayXXf CorrelationFlow::IFFT(const Eigen::ArrayXXcf& xf)
+{
 
     Eigen::ArrayXXf x = Eigen::ArrayXXf((xf.rows()-1)*2, xf.cols());
-
     Eigen::ArrayXXcf cxf = xf;
-
     fftwf_plan fft_plan = fftwf_plan_dft_c2r_2d(xf.cols(), (xf.rows()-1)*2, (float(*)[2])(cxf.data()),
         (float(*))(x.data()), FFTW_ESTIMATE);
-
     fftwf_execute(fft_plan);
-
     return x/x.size();
 }
 
+void CorrelationFlow::ComputeIntermedium(const Eigen::ArrayXXf& image, Eigen::ArrayXXcf& fft_result, Eigen::ArrayXXcf& fft_polar)
+{
+    fft_result = FFT(image);
+    fft_polar = FFT(polar(image));
+}
 
-float CorrelationFlow::ComputePose(Eigen::ArrayXXcf& last_fft_result, Eigen::ArrayXXcf& fft_result, Eigen::Vector3d& pose){
+float CorrelationFlow::ComputePose(const Eigen::ArrayXXcf& last_fft_result, const Eigen::ArrayXXcf& fft_result,
+                                   const Eigen::ArrayXXcf& last_fft_polar, const Eigen::ArrayXXcf& fft_polar,
+                                   Eigen::Vector3d& pose)
+{
+    Eigen::Vector2d trans, rots;
+    auto var_trans = EstimateTrans(last_fft_result, fft_result, trans);
+    auto var_rots = EstimateTrans(last_fft_result, fft_polar, rots);
+}
 
+float CorrelationFlow::EstimateTrans(const Eigen::ArrayXXcf& last_fft_result, const Eigen::ArrayXXcf& fft_result, Eigen::Vector2d& trans)
+{
     auto Kzz = gaussian_kernel(last_fft_result);
     auto Kxz = gaussian_kernel(fft_result, last_fft_result);
     auto H = target_fft/(Kzz + cfg.lambda);
@@ -46,11 +56,12 @@ float CorrelationFlow::ComputePose(Eigen::ArrayXXcf& last_fft_result, Eigen::Arr
     Eigen::ArrayXXf g = IFFT(G);
     Eigen::ArrayXXf::Index max_index[2];
     auto max_response = g.maxCoeff(&(max_index[0]), &(max_index[1]));
-    pose[0] = -(max_index[0]-cfg.width/2);
-    pose[1] = -(max_index[1]-cfg.height/2);
-    pose[2] = 0;
-    std::cout<<"pose: "<<pose.transpose()<<std::endl;
+    trans[0] = -(max_index[0]-cfg.width/2);
+    trans[1] = -(max_index[1]-cfg.height/2);
     return max_response;
+    // pose[2] = 0;
+    // std::cout<<"pose: "<<pose.transpose()<<std::endl;
+    // return max_response;
 }
 
 

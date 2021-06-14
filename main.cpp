@@ -52,10 +52,11 @@ int main(int argc, char** argv){
     Eigen::ArrayXXf image_array;
     ConvertMatToNormalizedArray(image, image_array);
 
-    Eigen::ArrayXXcf fft_result = correlation_flow->FFT(image_array);
+    Eigen::ArrayXXcf fft_result, fft_polar;
+    correlation_flow->ComputeIntermedium(image_array, fft_result, fft_polar);
 
     // 3. construct frame
-    FramePtr frame(new Frame(i, fft_result));
+    FramePtr frame(new Frame(i, image_array, fft_result, fft_polar));
 
     // 4. initialize
     if(!init){
@@ -73,9 +74,9 @@ int main(int argc, char** argv){
 
     // 5. tracking, compute relative pose
     Eigen::Vector3d relative_pose;
-    Eigen::ArrayXXcf last_fft_result;
-    last_frame->GetFFTResult(last_fft_result);
-    correlation_flow->ComputePose(last_fft_result, fft_result, relative_pose);
+    Eigen::ArrayXXcf last_fft_result, last_fft_polar;
+    last_frame->GetFFTResult(last_fft_result, last_fft_polar);
+    correlation_flow->ComputePose(last_fft_result, fft_result, last_fft_polar, fft_polar, relative_pose);
 
     // 6. set pose of current frame
     Eigen::Vector3d pose;
