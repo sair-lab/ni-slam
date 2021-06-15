@@ -39,9 +39,9 @@ LoopClosureResult LoopClosure::FindLoopClosure(FramePtr& current_frame, std::vec
     Eigen::ArrayXXcf fft_result, fft_polar;
     frame->GetFFTResult(fft_result, fft_polar);
     Eigen::Vector3d relative_pose;
-    float response = _correlation_flow->ComputePose(fft_result, current_fft_result, fft_polar, current_fft_polar, relative_pose);
-    if(response > result.response){
-      result.response = response;
+    Eigen::Vector3d var = _correlation_flow->ComputePose(fft_result, current_fft_result, fft_polar, current_fft_polar, relative_pose);
+    if(var.sum() > result.response){
+      result.response = var.sum();
       result.loop_frame = frame;
       result.relative_pose = relative_pose;
     }

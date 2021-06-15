@@ -13,6 +13,7 @@ Frame::Frame(int frame_id, Eigen::ArrayXXf& frame, Eigen::ArrayXXcf& fft_result,
 Frame& Frame::operator=(const Frame& other){
   _frame_id = other._frame_id;
   _fft_result = other._fft_result;
+  _fft_polar = other._fft_polar;
   _pose = other._pose;
   _edge_ids = other._edge_ids;
   return *this;

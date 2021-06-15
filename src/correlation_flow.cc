@@ -38,16 +38,20 @@ void CorrelationFlow::ComputeIntermedium(const Eigen::ArrayXXf& image, Eigen::Ar
     fft_polar = FFT(polar(image));
 }
 
-float CorrelationFlow::ComputePose(const Eigen::ArrayXXcf& last_fft_result, const Eigen::ArrayXXcf& fft_result,
+Eigen::Vector3d CorrelationFlow::ComputePose(const Eigen::ArrayXXcf& last_fft_result, const Eigen::ArrayXXcf& fft_result,
                                    const Eigen::ArrayXXcf& last_fft_polar, const Eigen::ArrayXXcf& fft_polar,
                                    Eigen::Vector3d& pose)
 {
     Eigen::Vector2d trans, rots;
+    Eigen::Vector3d var;
     auto var_trans = EstimateTrans(last_fft_result, fft_result, trans);
     auto var_rots = EstimateTrans(last_fft_polar, fft_polar, rots);
-    pose[0] = trans[0];
-    pose[1] = trans[1];
-    pose[2] = rots[0];
+    pose[0] = trans[0]; var[0] = var_trans;
+    pose[1] = trans[1]; var[1] = var_trans;
+    pose[2] = rots[0]; var[2] = var_rots;
+    std::cout<<"pose: "<<pose.transpose()<<std::endl;
+    std::cout<<"var:  "<<var.transpose()<<std::endl;
+    return var;
 }
 
 float CorrelationFlow::EstimateTrans(const Eigen::ArrayXXcf& last_fft_result, const Eigen::ArrayXXcf& fft_result, Eigen::Vector2d& trans)
@@ -62,9 +66,6 @@ float CorrelationFlow::EstimateTrans(const Eigen::ArrayXXcf& last_fft_result, co
     trans[0] = -(max_index[0]-cfg.width/2);
     trans[1] = -(max_index[1]-cfg.height/2);
     return max_response;
-    // pose[2] = 0;
-    // std::cout<<"pose: "<<pose.transpose()<<std::endl;
-    // return max_response;
 }
 
 
