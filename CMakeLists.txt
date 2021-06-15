@@ -142,6 +142,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/include
   ${EIGEN3_INCLUDE_DIR}
   ${YAML_CPP_INCLUDE_DIR}
+  ${CERES_INCLUDE_DIRS}
 )
 
 # Declare a C++ library
@@ -172,7 +173,8 @@ target_link_libraries(${PROJECT_NAME}_lib
    -lfftw3f
    ${OpenCV_LIBS}
    ${EIGEN3_LIBS}
-   Ceres::ceres
+   ${CERES_LIBRARIES}
+  #  Ceres::ceres
    ${YAML_CPP_LIBRARIES}
 )
 
