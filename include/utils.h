@@ -20,6 +20,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/opencv.hpp>
 
+// Eigen type
 template <template <typename, typename> class Container, typename Type>
 using Aligned = Container<Type, Eigen::aligned_allocator<Type>>;
 
@@ -43,6 +44,7 @@ using AlignedUnorderedSet =
     std::unordered_set<Type, std::hash<Type>, std::equal_to<Type>,
                        Eigen::aligned_allocator<Type>>;
 
+// files
 bool FileExists(const std::string& file);
 bool PathExists(const std::string& path);
 void ConcatenateFolderAndFileName(
@@ -55,11 +57,15 @@ std::string ConcatenateFolderAndFileName(
 void ReadTxt(const std::string& file_path, 
     std::vector<std::vector<std::string> >& lines, std::string seq);
 
+// correlation flow
 // Eigen::ArrayXXf& GenerateDepth(float height);
 void ConvertMatToNormalizedArray(cv::Mat& image, Eigen::ArrayXXf& array);
-
 Eigen::ArrayXXf ConvertMatToArray(const cv::Mat&);
-
 cv::Mat ConvertArrayToMat(const Eigen::ArrayXXf&);
+
+// Eigen pose
+Eigen::Vector3d ComputeRelativePose(Eigen::Vector3d& pose1, Eigen::Vector3d& pose2);
+Eigen::Vector3d ComputeAbsolutePose(Eigen::Vector3d& pose1, Eigen::Vector3d& relative_pose);
+
 
 #endif  // UTILS_H_

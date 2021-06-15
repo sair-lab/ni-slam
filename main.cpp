@@ -86,7 +86,8 @@ int main(int argc, char** argv){
     }else{
       Eigen::Vector3d last_pose;
       last_frame->GetPose(last_pose);
-      pose = last_pose + relative_pose;
+      // pose = last_pose + relative_pose;
+      pose = ComputeAbsolutePose(last_pose, relative_pose);
     }
     frame->SetPose(pose);
 
@@ -103,11 +104,13 @@ int main(int argc, char** argv){
     cf_edge->_information = Eigen::Matrix3d::Identity();
     map->AddEdge(cf_edge);
 
+    std::cout << "cf_edge.relative_pose = " << relative_pose << std::endl;
+
     if(OdomPoseIsAvailable){
       Eigen::Vector3d last_odom_pose, odom_pose, relative_odom_pose;
       dataset.GetPose(last_odom_pose, (i-1));
       dataset.GetPose(odom_pose, i);
-      relative_odom_pose = odom_pose - last_odom_pose;
+      relative_odom_pose = ComputeRelativePose(last_odom_pose, odom_pose);
 
       EdgePtr odom_edge = std::make_shared<Edge>();
       odom_edge->_edge_id = edge_id++;
@@ -117,6 +120,7 @@ int main(int argc, char** argv){
       odom_edge->_T = relative_odom_pose;
       odom_edge->_information = Eigen::Matrix3d::Identity();
       map->AddEdge(cf_edge);
+      std::cout << "odom_edge.relative_pose = " << relative_odom_pose << std::endl;
     }
 
     // 8. find loop closure

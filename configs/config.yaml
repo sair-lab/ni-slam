@@ -1,6 +1,6 @@
 dataset:
-  dataroot: "/media/xukuan/0000678400004823/dataset/ground_texture/uniform/mini"
-  camera_config: "/media/xukuan/0000678400004823/dataset/ground_texture/uniform/mini/camera.yaml"
+  dataroot: "/media/xukuan/0000678400004823/dataset/ground_texture/uniform/1220"
+  camera_config: "/media/xukuan/0000678400004823/dataset/ground_texture/uniform/1220/camera.yaml"
 
 correlation_flow:
   width: 448

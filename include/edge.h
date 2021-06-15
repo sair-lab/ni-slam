@@ -11,7 +11,8 @@ struct Edge{
   enum Type {
     Odom = 0,
     KCC = 1,
-    Others = 2,
+    Loop = 2,
+    Others = 3,
   };
 
   int _edge_id;

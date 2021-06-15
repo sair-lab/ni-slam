@@ -1,5 +1,7 @@
-#include "utils.h"
 #include <opencv2/core/eigen.hpp>
+
+#include "utils.h"
+#include "optimization_2d/pose_graph_2d_error_term.h"
 
 bool FileExists(const std::string& file) {
   struct stat file_status;
@@ -99,4 +101,23 @@ cv::Mat ConvertArrayToMat(const Eigen::ArrayXXf& array){
   Eigen::MatrixXf matrix(array);
   cv::eigen2cv(matrix, image);
   return image;
+}
+
+// Eigen pose
+Eigen::Vector3d ComputeRelativePose(
+    Eigen::Vector3d& pose1, Eigen::Vector3d& pose2){
+  Eigen::Vector3d result = pose2 - pose1;
+  Eigen::Matrix2d Rw1 = ceres::optimization_2d::RotationMatrix2D(pose1(2));
+  result.head(2) = Rw1.transpose() * result.head(2);
+  result(3) = ceres::optimization_2d::NormalizeAngle(result(3));
+  return result;
+}
+
+Eigen::Vector3d ComputeAbsolutePose(
+    Eigen::Vector3d& pose1, Eigen::Vector3d& relative_pose){
+  Eigen::Vector3d result = pose1 + relative_pose;
+  Eigen::Matrix2d Rw1 = ceres::optimization_2d::RotationMatrix2D(pose1(2));
+  result.head(2) = Rw1 * result.head(2);
+  result(3) = ceres::optimization_2d::NormalizeAngle(result(3));
+  return result;
 }

@@ -49,8 +49,8 @@ Eigen::Vector3d CorrelationFlow::ComputePose(const Eigen::ArrayXXcf& last_fft_re
     pose[0] = trans[0]; var[0] = var_trans;
     pose[1] = trans[1]; var[1] = var_trans;
     pose[2] = rots[0]; var[2] = var_rots;
-    std::cout<<"pose: "<<pose.transpose()<<std::endl;
-    std::cout<<"var:  "<<var.transpose()<<std::endl;
+    // std::cout<<"pose: "<<pose.transpose()<<std::endl;
+    // std::cout<<"var:  "<<var.transpose()<<std::endl;
     return var;
 }
 
