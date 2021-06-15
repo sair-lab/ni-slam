@@ -40,6 +40,7 @@ int main(int argc, char** argv){
   const bool OdomPoseIsAvailable = dataset.PoseIsAvailable();
   std::vector<LoopClosureResult> loop_matches;
   for(size_t i = 0; i < dataset_length; ++i){
+    std::cout << i << std::endl;
     // 1. read image and undistort
     cv::Mat image, undistort_image;
     if(!dataset.GetImage(image, i)){
