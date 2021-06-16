@@ -43,15 +43,15 @@ Eigen::Vector3d CorrelationFlow::ComputePose(const Eigen::ArrayXXcf& last_fft_re
                                    Eigen::Vector3d& pose)
 {
     Eigen::Vector2d trans, rots;
-    Eigen::Vector3d var;
-    auto var_trans = EstimateTrans(last_fft_result, fft_result, trans);
-    auto var_rots = EstimateTrans(last_fft_polar, fft_polar, rots);
-    pose[0] = trans[0]; var[0] = var_trans;
-    pose[1] = trans[1]; var[1] = var_trans;
-    pose[2] = rots[0]; var[2] = var_rots;
-    // std::cout<<"pose: "<<pose.transpose()<<std::endl;
-    // std::cout<<"var:  "<<var.transpose()<<std::endl;
-    return var;
+    Eigen::Vector3d info;
+    auto info_trans = EstimateTrans(last_fft_result, fft_result, trans);
+    auto info_rots = EstimateTrans(last_fft_polar, fft_polar, rots);
+    pose[0] = trans[0]; info[0] = info_trans;
+    pose[1] = trans[1]; info[1] = info_trans;
+    pose[2] = rots[0];  info[2] = info_rots;
+    std::cout<<"Pose: "<<pose.transpose()<<std::endl;
+    std::cout<<"Info: "<<info.transpose()<<std::endl;
+    return info;
 }
 
 float CorrelationFlow::EstimateTrans(const Eigen::ArrayXXcf& last_fft_result, const Eigen::ArrayXXcf& fft_result, Eigen::Vector2d& trans)
@@ -62,10 +62,10 @@ float CorrelationFlow::EstimateTrans(const Eigen::ArrayXXcf& last_fft_result, co
     Eigen::ArrayXXcf G = H*Kxz;
     Eigen::ArrayXXf g = IFFT(G);
     Eigen::ArrayXXf::Index max_index[2];
+    float response = g.maxCoeff(&(max_index[0]), &(max_index[1]));
     trans[0] = -(max_index[0]-cfg.width/2);
     trans[1] = -(max_index[1]-cfg.height/2);
-    float response = g.maxCoeff(&(max_index[0]), &(max_index[1]));
-    return GetCov(g, response);
+    return GetInfo(g, response);
 }
 
 
@@ -104,7 +104,7 @@ inline Eigen::ArrayXXf CorrelationFlow::polar(const Eigen::ArrayXXf& array)
     return ConvertMatToArray(polar_img);
 }
 
-inline float CorrelationFlow::GetCov(const Eigen::ArrayXXf& output, float response)
+inline float CorrelationFlow::GetInfo(const Eigen::ArrayXXf& output, float response)
 {
     float side_lobe_mean = (output.sum()-response)/(output.size()-1);
     float std  = sqrt((output-side_lobe_mean).square().mean());
