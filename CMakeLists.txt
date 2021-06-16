@@ -157,6 +157,7 @@ add_library(${PROJECT_NAME}_lib SHARED
   src/loop_closure.cc
   src/optimizer.cc
   src/map.cc
+  src/map_builder.cc
 )
 
 ## Add cmake target dependencies of the library

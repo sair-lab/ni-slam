@@ -7,3 +7,10 @@ correlation_flow:
   height: 448
   sigma: 0.2 # For Gaussian Kernel
   lambda: 0.1 # For regularization
+
+map:
+  grid_scale: 0.5 # the true size of one grid
+
+loop_closure:
+  position_response_thr: 0.05
+  angle_response_thr: 0.05

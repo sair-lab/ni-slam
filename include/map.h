@@ -6,6 +6,7 @@
 #include <unordered_set>
 #include <unordered_map>
 
+#include "read_configs.h"
 #include "frame.h"
 #include "edge.h"
 #include "utils.h"
@@ -45,7 +46,7 @@ typedef std::unordered_map<GridLocation, FrameSet, GridLocationHash, GridLocatio
 class Map{
 public:
   Map();
-  Map(double grid_scale);
+  Map(MapConfig& map_config);
 
   void AddFrame(FramePtr& frame);
   void AddEdge(EdgePtr& edge);

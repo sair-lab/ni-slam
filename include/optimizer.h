@@ -12,5 +12,6 @@ private:
   std::shared_ptr<Map> _map;
 };
 
+typedef std::shared_ptr<Optimizer> OptimizerPtr;
 
 #endif  // OPTIMIZER_H_

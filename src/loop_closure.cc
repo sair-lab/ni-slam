@@ -1,7 +1,10 @@
 #include "loop_closure.h"
 
-LoopClosure::LoopClosure(double response_thr, CorrelationFlowPtr correlation_flow, MapPtr map): 
-    _response_thr(response_thr), _correlation_flow(correlation_flow), _map(map){
+LoopClosure::LoopClosure(LoopClosureConfig& loop_closure_config, 
+    CorrelationFlowPtr correlation_flow, MapPtr map): 
+    _position_response_thr(loop_closure_config.position_response_thr),
+    _angle_response_thr(loop_closure_config.angle_response_thr),
+    _correlation_flow(correlation_flow), _map(map){
 }
 
 LoopClosureResult LoopClosure::FindLoopClosure(FramePtr& current_frame){
@@ -39,14 +42,16 @@ LoopClosureResult LoopClosure::FindLoopClosure(FramePtr& current_frame, std::vec
     Eigen::ArrayXXcf fft_result, fft_polar;
     frame->GetFFTResult(fft_result, fft_polar);
     Eigen::Vector3d relative_pose;
-    Eigen::Vector3d var = _correlation_flow->ComputePose(fft_result, current_fft_result, fft_polar, current_fft_polar, relative_pose);
-    if(var.sum() > result.response){
-      result.response = var.sum();
+    Eigen::Vector3d response = 
+        _correlation_flow->ComputePose(fft_result, current_fft_result, fft_polar, current_fft_polar, relative_pose);
+
+    if(response.sum() > result.response.sum()){
+      result.response = response;
       result.loop_frame = frame;
       result.relative_pose = relative_pose;
     }
   }
 
-  result.found = (result.response > _response_thr);
+  result.found = ((result.response(0) > _position_response_thr) && (result.response(2) > _angle_response_thr));
   return result;
 }

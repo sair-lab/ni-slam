@@ -18,13 +18,20 @@ struct CFConfig{
   float lambda;
 };
 
+struct MapConfig{
+  double grid_scale;
+};
+
 struct LoopClosureConfig{
-  double response_threshold;
+  double position_response_thr;
+  double angle_response_thr;
 };
 
 struct Configs{
   DatasetConfig dataset_config;
   CFConfig cf_config;
+  MapConfig map_config;
+  LoopClosureConfig loop_closure_config;
 
   Configs(const std::string& config_file){
     if(!FileExists(config_file)){
@@ -42,6 +49,16 @@ struct Configs{
     cf_config.height = cf_node["height"].as<int>();
     cf_config.sigma = cf_node["sigma"].as<float>();
     cf_config.lambda = cf_node["lambda"].as<float>();
+
+    YAML::Node map_node = file_node["map"];
+    map_config.grid_scale = map_node["grid_scale"].as<double>();
+
+    YAML::Node loop_closure_node = file_node["loop_closure"];
+    loop_closure_config.position_response_thr = 
+        loop_closure_node["position_response_thr"].as<double>();
+    loop_closure_config.angle_response_thr = 
+        loop_closure_node["angle_response_thr"].as<double>();
+
   }
 };
 

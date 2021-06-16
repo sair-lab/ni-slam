@@ -26,4 +26,6 @@ private:
   cv::Mat _map2;
 };
 
+typedef std::shared_ptr<Camera> CameraPtr;
+
 #endif  // CAMERA_H_

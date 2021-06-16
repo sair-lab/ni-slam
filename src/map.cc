@@ -6,7 +6,7 @@
 Map::Map(): _grid_scale(1.0){
 }
 
-Map::Map(double grid_scale): _grid_scale(grid_scale){
+Map::Map(MapConfig& map_config): _grid_scale(map_config.grid_scale){
 }
 
 void Map::AddFrame(FramePtr& frame){

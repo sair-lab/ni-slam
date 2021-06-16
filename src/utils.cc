@@ -1,4 +1,3 @@
-#include <opencv2/core/eigen.hpp>
 
 #include "utils.h"
 #include "optimization_2d/pose_graph_2d_error_term.h"
@@ -109,7 +108,7 @@ Eigen::Vector3d ComputeRelativePose(
   Eigen::Vector3d result = pose2 - pose1;
   Eigen::Matrix2d Rw1 = ceres::optimization_2d::RotationMatrix2D(pose1(2));
   result.head(2) = Rw1.transpose() * result.head(2);
-  result(3) = ceres::optimization_2d::NormalizeAngle(result(3));
+  result(2) = ceres::optimization_2d::NormalizeAngle(result(2));
   return result;
 }
 
@@ -118,6 +117,6 @@ Eigen::Vector3d ComputeAbsolutePose(
   Eigen::Vector3d result = pose1 + relative_pose;
   Eigen::Matrix2d Rw1 = ceres::optimization_2d::RotationMatrix2D(pose1(2));
   result.head(2) = Rw1 * result.head(2);
-  result(3) = ceres::optimization_2d::NormalizeAngle(result(3));
+  result(2) = ceres::optimization_2d::NormalizeAngle(result(2));
   return result;
 }
