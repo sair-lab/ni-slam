@@ -62,10 +62,10 @@ float CorrelationFlow::EstimateTrans(const Eigen::ArrayXXcf& last_fft_result, co
     Eigen::ArrayXXcf G = H*Kxz;
     Eigen::ArrayXXf g = IFFT(G);
     Eigen::ArrayXXf::Index max_index[2];
-    auto max_response = g.maxCoeff(&(max_index[0]), &(max_index[1]));
     trans[0] = -(max_index[0]-cfg.width/2);
     trans[1] = -(max_index[1]-cfg.height/2);
-    return max_response;
+    float response = g.maxCoeff(&(max_index[0]), &(max_index[1]));
+    return GetCov(g, response);
 }
 
 
@@ -102,4 +102,11 @@ inline Eigen::ArrayXXf CorrelationFlow::polar(const Eigen::ArrayXXf& array)
     double radius = (double)sqrt((img.rows/2)*(img.rows/2)+(img.cols/2)*(img.cols/2));
     cv::linearPolar(img, polar_img, center, radius, cv::INTER_LINEAR + cv::WARP_FILL_OUTLIERS);
     return ConvertMatToArray(polar_img);
+}
+
+inline float CorrelationFlow::GetCov(const Eigen::ArrayXXf& output, float response)
+{
+    float side_lobe_mean = (output.sum()-response)/(output.size()-1);
+    float std  = sqrt((output-side_lobe_mean).square().mean());
+    return (response - side_lobe_mean)/std;
 }

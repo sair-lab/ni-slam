@@ -22,6 +22,7 @@ private:
     inline Eigen::ArrayXXcf gaussian_kernel(const Eigen::ArrayXXcf&, const Eigen::ArrayXXcf&);
     float EstimateTrans(const Eigen::ArrayXXcf&, const Eigen::ArrayXXcf&, Eigen::Vector2d&);
     inline Eigen::ArrayXXf polar(const Eigen::ArrayXXf&);
+    inline float GetCov(const Eigen::ArrayXXf&, float);
 };
 
 typedef std::shared_ptr<CorrelationFlow> CorrelationFlowPtr;
