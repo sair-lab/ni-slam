@@ -1,3 +1,4 @@
+#include <math.h>
 #include "correlation_flow.h"
 #include "read_configs.h"
 
@@ -48,8 +49,8 @@ Eigen::Vector3d CorrelationFlow::ComputePose(const Eigen::ArrayXXcf& last_fft_re
     auto info_rots = EstimateTrans(last_fft_polar, fft_polar, rots);
     pose[0] = trans[0]; info[0] = info_trans;
     pose[1] = trans[1]; info[1] = info_trans;
-    pose[2] = rots[0];  info[2] = info_rots;
-    std::cout<<"Pose: "<<pose.transpose()<<std::endl;
+    pose[2] = rots[1]*(3.1415926/cfg.height); info[2] = info_rots;
+    std::cout<<"X, Y, \u0398: "<<pose.transpose()<<std::endl;
     std::cout<<"Info: "<<info.transpose()<<std::endl;
     return info;
 }
@@ -99,7 +100,7 @@ inline Eigen::ArrayXXf CorrelationFlow::polar(const Eigen::ArrayXXf& array)
 {
     cv::Mat polar_img, img=ConvertArrayToMat(array);
     cv::Point2f center((float)img.cols/2, (float)img.rows/2);
-    double radius = (double)sqrt((img.rows/2)*(img.rows/2)+(img.cols/2)*(img.cols/2));
+    double radius = (double)std::min(img.rows/2, img.cols/2);
     cv::linearPolar(img, polar_img, center, radius, cv::INTER_LINEAR + cv::WARP_FILL_OUTLIERS);
     return ConvertMatToArray(polar_img);
 }
