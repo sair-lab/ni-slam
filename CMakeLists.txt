@@ -6,18 +6,17 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-# find_package(catkin REQUIRED COMPONENTS
-#   cv_bridge
-#   eigen_conversions
-#   geometry_msgs
-#   image_transport
-#   message_filters
-#   nav_msgs
-#   roscpp
-#   rospy
-#   std_msgs
-#   sensor_msgs
-# )
+find_package(catkin REQUIRED COMPONENTS
+  cv_bridge
+  eigen_conversions
+  geometry_msgs
+  image_transport
+  nav_msgs
+  roscpp
+  rospy
+  std_msgs
+  sensor_msgs
+)
 
 find_package(OpenCV REQUIRED)
 find_package(OpenMP REQUIRED)
@@ -25,6 +24,7 @@ find_package(Eigen3 REQUIRED)
 find_package(FFTW3 REQUIRED)
 find_package(Ceres REQUIRED)
 find_package(yaml-cpp REQUIRED)
+find_package(Boost REQUIRED)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3 -march=native ")
@@ -143,6 +143,7 @@ include_directories(
   ${EIGEN3_INCLUDE_DIR}
   ${YAML_CPP_INCLUDE_DIR}
   ${CERES_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
 )
 
 # Declare a C++ library
@@ -157,7 +158,7 @@ add_library(${PROJECT_NAME}_lib SHARED
   src/loop_closure.cc
   src/optimizer.cc
   src/map.cc
-  src/map_builder.cc
+  src/thread_publisher.cc
 )
 
 ## Add cmake target dependencies of the library
@@ -177,6 +178,7 @@ target_link_libraries(${PROJECT_NAME}_lib
    ${CERES_LIBRARIES}
   #  Ceres::ceres
    ${YAML_CPP_LIBRARIES}
+   ${Boost_LIBRARIES}
 )
 
 ## Declare a C++ executable
