@@ -113,10 +113,17 @@ Eigen::Vector3d ComputeRelativePose(
 }
 
 Eigen::Vector3d ComputeAbsolutePose(
-    Eigen::Vector3d& pose1, Eigen::Vector3d& relative_pose){
+  Eigen::Vector3d& pose1, Eigen::Vector3d& relative_pose){
   Eigen::Vector3d result = pose1 + relative_pose;
   Eigen::Matrix2d Rw1 = ceres::optimization_2d::RotationMatrix2D(pose1(2));
   result.head(2) = Rw1 * result.head(2);
   result(2) = ceres::optimization_2d::NormalizeAngle(result(2));
   return result;
+}
+
+void ShowArray(const Eigen::ArrayXXf& array, int waitkey=1)
+{
+  auto img = ConvertArrayToMat(array);
+  cv::imshow("test", img);
+  cv::waitKey(waitkey);
 }

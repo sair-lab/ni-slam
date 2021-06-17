@@ -68,5 +68,6 @@ cv::Mat ConvertArrayToMat(const Eigen::ArrayXXf&);
 Eigen::Vector3d ComputeRelativePose(Eigen::Vector3d& pose1, Eigen::Vector3d& pose2);
 Eigen::Vector3d ComputeAbsolutePose(Eigen::Vector3d& pose1, Eigen::Vector3d& relative_pose);
 
+void ShowArray(const Eigen::ArrayXXf&, int);
 
 #endif  // UTILS_H_
