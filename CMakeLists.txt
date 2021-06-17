@@ -8,7 +8,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   cv_bridge
-  eigen_conversions
+  # eigen_conversions
   geometry_msgs
   image_transport
   nav_msgs
@@ -138,7 +138,7 @@ endif()
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  # ${catkin_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/include
   ${EIGEN3_INCLUDE_DIR}
   ${YAML_CPP_INCLUDE_DIR}
@@ -158,7 +158,9 @@ add_library(${PROJECT_NAME}_lib SHARED
   src/loop_closure.cc
   src/optimizer.cc
   src/map.cc
+  src/map_builder.cc
   src/thread_publisher.cc
+  src/map_stitcher.cc
 )
 
 ## Add cmake target dependencies of the library
@@ -189,7 +191,7 @@ add_executable(${PROJECT_NAME} main.cpp)
 # add_dependencies({PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_lib)
+target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_lib ${catkin_LIBRARIES})
 
 #############
 ## Install ##

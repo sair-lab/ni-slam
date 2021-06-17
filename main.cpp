@@ -34,13 +34,6 @@ int main(int argc, char** argv){
   const bool OdomPoseIsAvailable = dataset.PoseIsAvailable();
   MapBuilder map_builder(configs, OdomPoseIsAvailable);
 
-  // publish function
-  std::function<void(const FrameMatchMsg::ConstPtr&)> publish_feature_tracking_function = 
-      [&](const FrameMatchMsg::ConstPtr& feature_tracking_msg){
-    PublishFeatureTracking(feature_tracking_msg);
-  };
-
-
   size_t dataset_length = dataset.GetDatasetLength();
   for(size_t i = 0; i < dataset_length; ++i){
     std::cout << i << std::endl;
