@@ -49,9 +49,9 @@ Eigen::Vector3d CorrelationFlow::ComputePose(const Eigen::ArrayXXcf& last_fft_re
     auto info_rots = EstimateTrans(last_fft_polar, fft_polar, rots);
     pose[0] = trans[0]; info[0] = info_trans;
     pose[1] = trans[1]; info[1] = info_trans;
-    pose[2] = rots[1]*(3.1415926/cfg.height); info[2] = info_rots;
+    pose[2] = rots[0]*(3.1415926/cfg.height); info[2] = info_rots;
     std::cout<<"X, Y, \u0398: "<<pose.transpose()<<std::endl;
-    std::cout<<"Info: "<<info.transpose()<<std::endl;
+    std::cout<<"Info: "<<pose.transpose()<<std::endl;
     return info;
 }
 
@@ -62,10 +62,10 @@ float CorrelationFlow::EstimateTrans(const Eigen::ArrayXXcf& last_fft_result, co
     auto H = target_fft/(Kzz + cfg.lambda);
     Eigen::ArrayXXcf G = H*Kxz;
     Eigen::ArrayXXf g = IFFT(G);
-    Eigen::ArrayXXf::Index max_index[2];
-    float response = g.maxCoeff(&(max_index[0]), &(max_index[1]));
-    trans[0] = -(max_index[0]-cfg.width/2);
-    trans[1] = -(max_index[1]-cfg.height/2);
+    Eigen::ArrayXXf::Index height, width;
+    float response = g.maxCoeff(&(height), &(width));
+    trans[0] = -(height-cfg.height/2);
+    trans[1] = -(width-cfg.width/2);
     return GetInfo(g, response);
 }
 

@@ -1,6 +1,6 @@
 dataset:
-  dataroot: "/data/datasets/ground_texture/mini"
-  camera_config: "/data/datasets/ground_texture/mini/camera.yaml"
+  dataroot: "/data/datasets/ground_texture/rotation"
+  camera_config: "/data/datasets/ground_texture/rotation/camera.yaml"
 
 correlation_flow:
   width: 448
