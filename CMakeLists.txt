@@ -35,7 +35,7 @@ if (OPENMP_FOUND)
 endif()
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -124,12 +124,12 @@ endif()
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 
-# catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES correlation_flow
-#  CATKIN_DEPENDS cv_bridge eigen_conversions geometry_msgs image_transport message_filters nav_msgs roscpp rospy std_msgs
-#  DEPENDS system_lib
-# )
+catkin_package(
+ INCLUDE_DIRS include
+ LIBRARIES correlation_flow
+ CATKIN_DEPENDS cv_bridge geometry_msgs image_transport nav_msgs roscpp rospy std_msgs
+ DEPENDS system_lib
+)
 
 ###########
 ## Build ##
