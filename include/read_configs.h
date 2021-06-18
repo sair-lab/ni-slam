@@ -16,6 +16,7 @@ struct CFConfig{
   int height;
   float sigma;
   float lambda;
+  int rotation_divisor;
 };
 
 struct MapConfig{
@@ -49,6 +50,7 @@ struct Configs{
     cf_config.height = cf_node["height"].as<int>();
     cf_config.sigma = cf_node["sigma"].as<float>();
     cf_config.lambda = cf_node["lambda"].as<float>();
+    cf_config.rotation_divisor = cf_node["rotation_divisor"].as<int>();
 
     YAML::Node map_node = file_node["map"];
     map_config.grid_scale = map_node["grid_scale"].as<double>();

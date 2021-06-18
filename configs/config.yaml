@@ -5,6 +5,7 @@ dataset:
 correlation_flow:
   width: 448
   height: 448
+  rotation_divisor: 720 # Higher means more accurate, but slower
   sigma: 0.2 # For Gaussian Kernel
   lambda: 0.1 # For regularization
 
