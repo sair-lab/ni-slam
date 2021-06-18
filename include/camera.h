@@ -14,6 +14,10 @@ public:
   
   void UndistortImage(cv::Mat& image, cv::Mat& undistort_image);
   void GetNewCameraMatrix(cv::Mat& camera_matrix);
+  double GetImageHeight();
+  double GetImageWidth();
+  double GetHeight();
+  void GetExtrinsics(Eigen::Matrix3d& extrinsics);
 
 private:
   int _image_height;
@@ -24,6 +28,7 @@ private:
   cv::Mat _D;
   cv::Mat _map1;
   cv::Mat _map2;
+  Eigen::Matrix3d _extrinsics
 };
 
 typedef std::shared_ptr<Camera> CameraPtr;

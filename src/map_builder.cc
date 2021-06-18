@@ -1,5 +1,15 @@
 #include "map_builder.h"
 
+#include <set>
+#include <string>
+#include <Eigen/Dense>
+#include <Eigen/SparseCore>
+
+#include "edge.h"
+#include "utils.h"
+#include "optimization_2d/types.h"
+#include "optimization_2d/pose_graph_2d.h"
+
 MapBuilder::MapBuilder(Configs& configs, const bool odom_is_available):
     OdomPoseIsAvailable(odom_is_available), _init(false), _frame_id(0), _edge_id(0){
   _camera = std::shared_ptr<Camera>(new Camera(configs.dataset_config.camera_file));
@@ -8,7 +18,6 @@ MapBuilder::MapBuilder(Configs& configs, const bool odom_is_available):
 
   _loop_closure = std::shared_ptr<LoopClosure>(
       new LoopClosure(configs.loop_closure_config, _correlation_flow, _map));
-  _optimizer = std::shared_ptr<Optimizer>(new Optimizer(_map));
 }
 
 void MapBuilder::AddNewInput(cv::Mat& image, Eigen::Vector3d& odom_pose){
@@ -50,7 +59,7 @@ void MapBuilder::AddNewInput(cv::Mat& image, Eigen::Vector3d& odom_pose){
 
   FindLoopClosure();
   if(_loop_matches.size() >= 3){
-    _optimizer->OptimizeMap();
+    OptimizeMap();
   }
 
   UpdateIntermedium();
@@ -98,7 +107,7 @@ void MapBuilder::AddCFEdgeToMap(Eigen::Vector3d& relative_pose){
   cf_edge->_to = _current_frame->GetFrameId();
   cf_edge->_T = relative_pose;
   cf_edge->_information = Eigen::Matrix3d::Identity();
-  // std::cout << "cf_edge relative_pose = " << relative_pose.transpose() << std::endl;
+  std::cout << "cf_edge relative_pose = " << relative_pose.transpose() << std::endl;
   _map->AddEdge(cf_edge);
 }
 
@@ -115,7 +124,7 @@ void MapBuilder::AddOdomEdgeToMap(){
   odom_edge->_to = _current_frame->GetFrameId();
   odom_edge->_T = relative_odom_pose;
   odom_edge->_information = Eigen::Matrix3d::Identity();
-  // std::cout << "odom_edge relative_pose = " << relative_odom_pose.transpose() << std::endl;
+  std::cout << "odom_edge relative_pose = " << relative_odom_pose.transpose() << std::endl;
   _map->AddEdge(odom_edge);
 }
 
@@ -127,4 +136,55 @@ bool MapBuilder::FindLoopClosure(){
     _loop_matches.clear();
   }
   return loop_closure_result.found;
+}
+
+void MapBuilder::OptimizeMap(){
+  std::map<int, ceres::optimization_2d::Pose2d> poses;
+  std::vector<ceres::optimization_2d::Constraint2d> constraints;
+
+  std::vector<FramePtr> frames;
+  std::set<int> frame_ids;
+  std::vector<EdgePtr> edges;
+  _map->GetAllFrames(frames);
+  _map->GetAllEdges(edges);
+
+  for(FramePtr& frame : frames){
+    int frame_id = frame->GetFrameId();
+    Eigen::Vector3d pose_vec;
+    frame->GetPose(pose_vec);
+
+    frame_ids.insert(frame_id);
+    ceres::optimization_2d::Pose2d pose_2d;
+    pose_2d.x = pose_vec(0);
+    pose_2d.y = pose_vec(1);
+    pose_2d.yaw_radians = pose_vec(2);
+    poses.insert(std::pair<int, ceres::optimization_2d::Pose2d>(frame_id, pose_2d));
+  }
+
+  for(EdgePtr& edge : edges){
+    int from = edge->_from;
+    int to = edge->_to;
+    if((frame_ids.count(from) < 1) || (frame_ids.count(to) < 1)){
+      continue;
+    }
+
+    ceres::optimization_2d::Constraint2d constraint;
+    constraint.id_begin = from;
+    constraint.id_end = to;
+    constraint.x = edge->_T(0);
+    constraint.y = edge->_T(1);
+    constraint.yaw_radians = edge->_T(2);
+  }
+
+  ceres::Problem problem;
+  ceres::optimization_2d::BuildOptimizationProblem(constraints, &poses, &problem);
+  CHECK(ceres::optimization_2d::SolveOptimizationProblem(&problem))
+      << "The solve was not successful, exiting.";
+
+  AlignedMap<int, Eigen::Vector3d> frame_poses;
+  for(auto kv : poses){
+    Eigen::Vector3d frame_pose;
+    frame_pose << kv.second.x, kv.second.y, kv.second.yaw_radians;
+    frame_poses[kv.first] = frame_pose;
+  }
 }

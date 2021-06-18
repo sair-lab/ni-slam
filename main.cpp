@@ -37,9 +37,9 @@ int main(int argc, char** argv){
   size_t dataset_length = dataset.GetDatasetLength();
   for(size_t i = 0; i < dataset_length; ++i){
     std::cout << i << std::endl;
-    // if (i%5 != 0){
-    //   continue;
-    // }
+    if (i%5 != 0){
+      continue;
+    }
     cv::Mat image;
     if(!dataset.GetImage(image, i)){
       std::cout << "can not get image " << i << std::endl;

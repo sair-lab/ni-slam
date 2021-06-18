@@ -61,6 +61,7 @@ public:
   int GetFramesInGrids(std::vector<FramePtr>& frames, std::vector<GridLocation>& grid_locations);
 
 private:
+  CameraPtr camera;
   std::map<int, FramePtr> _frames;
   std::map<int, EdgePtr> _edges;
   double _grid_scale;

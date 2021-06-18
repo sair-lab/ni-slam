@@ -7,7 +7,6 @@
 #include "correlation_flow.h"
 #include "map.h"
 #include "loop_closure.h"
-#include "optimizer.h"
 
 class MapBuilder{
 public:
@@ -22,6 +21,7 @@ public:
   void AddCFEdgeToMap(Eigen::Vector3d& relative_pose);
   void AddOdomEdgeToMap();
   bool FindLoopClosure();
+  bool OptimizeMap();
 
 private:
   const bool OdomPoseIsAvailable;
@@ -49,7 +49,7 @@ private:
   CorrelationFlowPtr _correlation_flow;
   MapPtr _map;
   LoopClosurePtr _loop_closure;
-  OptimizerPtr _optimizer;
+  // OptimizerPtr _optimizer;
 };
 
 

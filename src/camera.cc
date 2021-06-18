@@ -35,6 +35,14 @@ Camera::Camera(const std::string& camera_file){
   cv::Size image_size(_image_width, _image_height);
   _new_K = getOptimalNewCameraMatrix(_K, _D, image_size, 0, image_size);
   initUndistortRectifyMap(_K, _D, cv::Mat(), _new_K, image_size, CV_16SC2, _map1, _map2);
+
+  YAML::Node E_node = file_node["extrinsics"]["data"];
+  for(size_t i = 0; i < 3; i++){
+    for(size_t j = 0; j < 3; j++){
+      size_t idx = 3 * i + j;
+      _extrinsics(i, j) = E_node[idx].as<double>();
+    }
+  }
 }
 
 Camera& Camera::operator=(const Camera& camera){
@@ -46,6 +54,7 @@ Camera& Camera::operator=(const Camera& camera){
   _D = camera._D.clone();
   _map1 = camera._map1.clone();
   _map2 = camera._map2.clone();
+  _extrinsics = camera._extrinsics;
   return *this;
 }
 
@@ -55,4 +64,20 @@ void Camera::UndistortImage(cv::Mat& image, cv::Mat& undistort_image){
 
 void Camera::GetNewCameraMatrix(cv::Mat& camera_matrix){
   camera_matrix = _new_K.clone();
+}
+
+double Camera::GetImageHeight(){
+  return _image_height;
+}
+
+double Camera::GetImageWidth(){
+  return _image_width;
+}
+
+double Camera::GetHeight(){
+  return _height;
+}
+
+void Camera::GetExtrinsics(Eigen::Matrix3d& extrinsics){
+  extrinsics = _extrinsics;
 }
