@@ -1,10 +1,11 @@
 #include "loop_closure.h"
 
+#include <cmath>
+
 LoopClosure::LoopClosure(LoopClosureConfig& loop_closure_config, 
     CorrelationFlowPtr correlation_flow, MapPtr map): 
-    _position_response_thr(loop_closure_config.position_response_thr),
-    _angle_response_thr(loop_closure_config.angle_response_thr),
-    _correlation_flow(correlation_flow), _map(map){
+    _loop_thr(loop_closure_config),  _correlation_flow(correlation_flow), _map(map){
+      std::cout << "_loop_thr.distance_thr = " << _loop_thr.distance_thr << std::endl;
 }
 
 LoopClosureResult LoopClosure::FindLoopClosure(FramePtr& current_frame){
@@ -39,6 +40,18 @@ LoopClosureResult LoopClosure::FindLoopClosure(FramePtr& current_frame, std::vec
   LoopClosureResult result;
   result.current_frame = current_frame;
   for(FramePtr frame : frames){
+    if(_loop_thr.frame_gap_thr > 0 && 
+        std::abs((current_frame->GetFrameId() - frame->GetFrameId())) < _loop_thr.frame_gap_thr){
+      continue;
+    }
+    if(_loop_thr.distance_thr > 0){
+      double d1 = _map->GetFrameDistance(current_frame);
+      double d2 = _map->GetFrameDistance(frame);
+      if(std::abs((d1 - d2)) < _loop_thr.distance_thr){
+        continue;
+      }
+    }
+
     Eigen::ArrayXXcf fft_result, fft_polar;
     frame->GetFFTResult(fft_result, fft_polar);
     Eigen::Vector3d relative_pose;
@@ -52,6 +65,9 @@ LoopClosureResult LoopClosure::FindLoopClosure(FramePtr& current_frame, std::vec
     }
   }
 
-  result.found = ((result.response(0) > _position_response_thr) && (result.response(2) > _angle_response_thr));
+  bool c1 = (result.response(0) > _loop_thr.position_response_thr);
+  bool c2 = (result.response(2) > _loop_thr.angle_response_thr);
+
+  result.found = (c1 && c2);
   return result;
 }

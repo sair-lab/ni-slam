@@ -18,9 +18,12 @@ public:
   bool Initialize();
   void UpdateIntermedium();
   bool Tracking(Eigen::Vector3d& relative_pose);
-  void AddCFEdgeToMap(Eigen::Vector3d& relative_pose);
+  void AddCFEdgeToMap(Eigen::Vector3d& relative_pose, 
+      int from, int to, int edge_id, Eigen::Matrix3d& info);
   void AddOdomEdgeToMap();
+  void SetFrameDistance();
   bool FindLoopClosure();
+  void AddLoopEdges();
   bool OptimizeMap();
 
 private:
@@ -32,10 +35,16 @@ private:
   // tmp
   FramePtr _last_frame;
   FramePtr _current_frame;
-  Eigen::Vector3d _last_odom_pose;
-  Eigen::Vector3d _current_odom_pose;
+  // image plane pose
+  Eigen::Vector3d _last_cf_pose;
+  Eigen::Vector3d _current_cf_pose;
+  // real scale pose
+  Eigen::Vector3d _last_cf_real_pose;
+  Eigen::Vector3d _current_cf_real_pose;
   Eigen::Vector3d _last_pose;
   Eigen::Vector3d _current_pose;
+  // distance
+  double _distance;
 
   // Intermedium rsults
   Eigen::ArrayXXf _image_array;

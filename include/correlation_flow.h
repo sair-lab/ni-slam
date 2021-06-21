@@ -15,12 +15,13 @@ public:
 private:
     CFConfig cfg;
     Eigen::ArrayXXcf target_fft;
-    Eigen::ArrayXXcf filter_fft;
+    Eigen::ArrayXXcf target_rotation_fft;
     Eigen::ArrayXXcf FFT(const Eigen::ArrayXXf&);
     Eigen::ArrayXXf IFFT(const Eigen::ArrayXXcf&);
-    inline Eigen::ArrayXXcf gaussian_kernel(const Eigen::ArrayXXcf&);
-    inline Eigen::ArrayXXcf gaussian_kernel(const Eigen::ArrayXXcf&, const Eigen::ArrayXXcf&);
-    float EstimateTrans(const Eigen::ArrayXXcf&, const Eigen::ArrayXXcf&, Eigen::Vector2d&);
+    Eigen::ArrayXXcf GetTargetFFT(int, int);
+    inline Eigen::ArrayXXcf gaussian_kernel(const Eigen::ArrayXXcf&, int, int);
+    inline Eigen::ArrayXXcf gaussian_kernel(const Eigen::ArrayXXcf&, const Eigen::ArrayXXcf&, int, int);
+    float EstimateTrans(const Eigen::ArrayXXcf&, const Eigen::ArrayXXcf&, const Eigen::ArrayXXcf&, int, int, Eigen::Vector2d&);
     inline Eigen::ArrayXXf polar(const Eigen::ArrayXXf&);
     inline float GetInfo(const Eigen::ArrayXXf&, float);
 };

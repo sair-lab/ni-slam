@@ -37,7 +37,7 @@ int main(int argc, char** argv){
   size_t dataset_length = dataset.GetDatasetLength();
   for(size_t i = 0; i < dataset_length; ++i){
     std::cout << i << std::endl;
-    if (i%5 != 0){
+    if (i%3 != 0){
       continue;
     }
     cv::Mat image;
@@ -52,6 +52,7 @@ int main(int argc, char** argv){
     }
     map_builder.AddNewInput(image, pose);
   }
+  map_builder.OptimizeMap();
 
 
 

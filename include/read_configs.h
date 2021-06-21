@@ -16,6 +16,7 @@ struct CFConfig{
   int height;
   float sigma;
   float lambda;
+  int rotation_divisor;
 };
 
 struct MapConfig{
@@ -25,6 +26,8 @@ struct MapConfig{
 struct LoopClosureConfig{
   double position_response_thr;
   double angle_response_thr;
+  int frame_gap_thr;
+  double distance_thr;
 };
 
 struct Configs{
@@ -49,6 +52,7 @@ struct Configs{
     cf_config.height = cf_node["height"].as<int>();
     cf_config.sigma = cf_node["sigma"].as<float>();
     cf_config.lambda = cf_node["lambda"].as<float>();
+    cf_config.rotation_divisor = cf_node["rotation_divisor"].as<int>();
 
     YAML::Node map_node = file_node["map"];
     map_config.grid_scale = map_node["grid_scale"].as<double>();
@@ -58,6 +62,10 @@ struct Configs{
         loop_closure_node["position_response_thr"].as<double>();
     loop_closure_config.angle_response_thr = 
         loop_closure_node["angle_response_thr"].as<double>();
+    loop_closure_config.frame_gap_thr = 
+        loop_closure_node["frame_gap_thr"].as<int>();
+    loop_closure_config.distance_thr = 
+        loop_closure_node["distance_thr"].as<double>();
 
   }
 };

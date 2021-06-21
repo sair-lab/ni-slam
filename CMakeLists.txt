@@ -7,7 +7,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  cv_bridge
+  # cv_bridge
   # eigen_conversions
   geometry_msgs
   image_transport
@@ -18,7 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
 )
 
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 4.2 REQUIRED)
 find_package(OpenMP REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(FFTW3 REQUIRED)
@@ -127,7 +127,7 @@ find_package(Boost REQUIRED COMPONENTS system)
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES correlation_flow
- CATKIN_DEPENDS cv_bridge geometry_msgs image_transport nav_msgs roscpp rospy std_msgs
+ CATKIN_DEPENDS geometry_msgs image_transport nav_msgs roscpp rospy std_msgs
  DEPENDS system_lib
 )
 
@@ -138,6 +138,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
+  ${OpenCV_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/include
   ${EIGEN3_INCLUDE_DIR}
