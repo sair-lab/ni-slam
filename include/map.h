@@ -63,8 +63,10 @@ public:
   GridLocation ComputeGridLocation(Eigen::Vector3d pose);
   int GetFramesInGrids(std::vector<FramePtr>& frames, std::vector<GridLocation>& grid_locations);
 
+  FramePtr GetBaseframe();
+
 private:
-  CameraPtr camera;
+  CameraPtr _camera;
   std::map<int, FramePtr> _frames;
   std::map<FramePtr, double> _frame_distanses;
   std::map<int, EdgePtr> _edges;

@@ -57,13 +57,13 @@ void MapBuilder::AddNewInput(cv::Mat& image, Eigen::Vector3d& odom_pose){
   // std::cout << "relative_cf_real_pose = " << relative_cf_real_pose.transpose() << std::endl;
   
   // debug
-  Eigen::Vector3d last_cf_robot_pose, current_cf_robot_pose;
-  _camera->ConvertCameraPoseToRobot(_last_cf_real_pose, last_cf_robot_pose);
-  _camera->ConvertCameraPoseToRobot(_current_cf_real_pose, current_cf_robot_pose);
-  Eigen::Vector3d relative_cf_robot_pose = ComputeRelativePose(last_cf_robot_pose, current_cf_robot_pose);
+  // Eigen::Vector3d last_cf_robot_pose, current_cf_robot_pose;
+  // _camera->ConvertCameraPoseToRobot(_last_cf_real_pose, last_cf_robot_pose);
+  // _camera->ConvertCameraPoseToRobot(_current_cf_real_pose, current_cf_robot_pose);
+  // Eigen::Vector3d relative_cf_robot_pose = ComputeRelativePose(last_cf_robot_pose, current_cf_robot_pose);
   // std::cout << "last_cf_robot_pose = " << last_cf_robot_pose.transpose() << std::endl;
   // std::cout << "current_cf_robot_pose = " << current_cf_robot_pose.transpose() << std::endl;
-  std::cout << "relative_cf_robot_pose = " << relative_cf_robot_pose.transpose() << std::endl;
+  // std::cout << "relative_cf_robot_pose = " << relative_cf_robot_pose.transpose() << std::endl;
   ////////
 
   Eigen::Matrix3d info = Eigen::Matrix3d::Identity();
@@ -123,7 +123,7 @@ void MapBuilder::UpdateIntermedium(){
 bool MapBuilder::Tracking(Eigen::Vector3d& relative_pose){
   Eigen::Vector3d response = _correlation_flow->ComputePose(
       _last_fft_result, _fft_result, _last_fft_polar, _fft_polar, relative_pose);
-  std::cout << "cf_edge response = " << response.transpose() << std::endl;
+  // std::cout << "cf_edge response = " << response.transpose() << std::endl;
   return true;
 }
 
@@ -136,7 +136,7 @@ void MapBuilder::AddCFEdgeToMap(
   cf_edge->_to = to;
   cf_edge->_T = relative_pose;
   cf_edge->_information = info;
-  std::cout << "cf_edge relative_pose = " << relative_pose.transpose() << std::endl;
+  // std::cout << "cf_edge relative_pose = " << relative_pose.transpose() << std::endl;
   _map->AddEdge(cf_edge);
 }
 
@@ -262,6 +262,40 @@ bool MapBuilder::OptimizeMap(){
     Eigen::Vector3d frame_pose;
     frame_pose << kv.second.x, kv.second.y, kv.second.yaw_radians;
     frame_poses[kv.first] = frame_pose;
+  }
+
+  return true;
+}
+
+// for visualization
+bool MapBuilder::GetOdomPose(Eigen::Vector3d& pose){
+  if(!OdomPoseIsAvailable) return false;
+  Eigen::Vector3d baseframe_pose;
+  _map->GetBaseframe()->GetPose(baseframe_pose);
+  pose = ComputeRelativePose(baseframe_pose, _current_pose);
+  return true;
+}
+
+bool MapBuilder::GetCFPose(Eigen::Vector3d& pose){
+  Eigen::Vector3d cf_base_pose(0.0, 0.0, 0.0);
+  Eigen::Vector3d robot_base_pose;
+  _camera->ConvertImagePlanePoseToRobot(cf_base_pose, robot_base_pose);
+
+  Eigen::Vector3d robot_current_pose;
+  _camera->ConvertImagePlanePoseToRobot(_current_cf_pose, robot_current_pose);
+  pose = ComputeRelativePose(robot_base_pose, robot_current_pose);
+  return true;
+}
+
+bool MapBuilder::GetFramePoses(Aligned<std::vector, Eigen::Vector3d>& poses){
+  poses.clear();
+  std::vector<FramePtr> frames;
+  _map->GetAllFrames(frames);
+
+  for(auto frame : frames){
+    Eigen::Vector3d pose;
+    frame->GetPose(pose);
+    poses.emplace_back(pose);
   }
 
   return true;

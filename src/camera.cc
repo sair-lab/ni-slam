@@ -98,8 +98,8 @@ bool Camera::ConvertImagePlanePoseToCamera(
   double fy = _new_K.at<double>(1, 1);
   double cy = _new_K.at<double>(1, 2);
 
-  double x = (u - cx) / fx;
-  double y = (v - cy) / fy;
+  double x = u / fx;
+  double y = v / fy;
 
   camera_pose << x, y, angle;
 
@@ -117,8 +117,8 @@ bool Camera::ConvertCameraPoseToImagePlane(
   double fy = _new_K.at<double>(1, 1);
   double cy = _new_K.at<double>(1, 2); 
 
-  double u = fx * x + cx;
-  double v = fy * y + cy;
+  double u = fx * x;
+  double v = fy * y;
 
   image_plane_pose << u, v, angle;
 

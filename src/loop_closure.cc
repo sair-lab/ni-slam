@@ -5,7 +5,6 @@
 LoopClosure::LoopClosure(LoopClosureConfig& loop_closure_config, 
     CorrelationFlowPtr correlation_flow, MapPtr map): 
     _loop_thr(loop_closure_config),  _correlation_flow(correlation_flow), _map(map){
-      std::cout << "_loop_thr.distance_thr = " << _loop_thr.distance_thr << std::endl;
 }
 
 LoopClosureResult LoopClosure::FindLoopClosure(FramePtr& current_frame){

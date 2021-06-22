@@ -127,7 +127,7 @@ find_package(Boost REQUIRED COMPONENTS system)
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES correlation_flow
- CATKIN_DEPENDS geometry_msgs image_transport nav_msgs roscpp rospy std_msgs
+ CATKIN_DEPENDS geometry_msgs visualization_msgs image_transport nav_msgs roscpp rospy std_msgs
  DEPENDS system_lib
 )
 
@@ -162,6 +162,7 @@ add_library(${PROJECT_NAME}_lib SHARED
   src/map_builder.cc
   src/thread_publisher.cc
   src/map_stitcher.cc
+  src/visualization.cc
 )
 
 ## Add cmake target dependencies of the library
@@ -174,14 +175,15 @@ add_library(${PROJECT_NAME}_lib SHARED
 
 
 target_link_libraries(${PROJECT_NAME}_lib
-   -lfftw3 
-   -lfftw3f
-   ${OpenCV_LIBS}
-   ${EIGEN3_LIBS}
-   ${CERES_LIBRARIES}
+  -lfftw3 
+  -lfftw3f
+  ${OpenCV_LIBS}
+  ${EIGEN3_LIBS}
+  ${CERES_LIBRARIES}
   #  Ceres::ceres
-   ${YAML_CPP_LIBRARIES}
-   ${Boost_LIBRARIES}
+  ${YAML_CPP_LIBRARIES}
+  ${Boost_LIBRARIES}
+  ${catkin_LIBRARIES}
 )
 
 ## Declare a C++ executable
@@ -192,7 +194,7 @@ add_executable(${PROJECT_NAME} main.cpp)
 # add_dependencies({PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_lib ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}_lib)
 
 #############
 ## Install ##

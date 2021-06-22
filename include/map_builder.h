@@ -26,6 +26,11 @@ public:
   void AddLoopEdges();
   bool OptimizeMap();
 
+  // for visualization
+  bool GetOdomPose(Eigen::Vector3d& pose);  // odom pose in baseframe
+  bool GetCFPose(Eigen::Vector3d& pose);    // rlt robot pose 
+  bool GetFramePoses(Aligned<std::vector, Eigen::Vector3d>& poses);
+
 private:
   const bool OdomPoseIsAvailable;
   bool _init;

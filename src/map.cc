@@ -95,3 +95,7 @@ int Map::GetFramesInGrids(
   }
   return frames.size();
 }
+
+FramePtr Map::GetBaseframe(){
+  return _baseframe;
+}

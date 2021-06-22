@@ -14,12 +14,14 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <nav_msgs/Odometry.h>
 #include <nav_msgs/Path.h>
+#include <visualization_msgs/Marker.h>
 
 #include "read_configs.h"
 #include "dataset.h"
 #include "camera.h"
 #include "map_builder.h"
 #include "thread_publisher.h"
+#include "visualization.h"
 
 int main(int argc, char** argv){
   ros::init(argc, argv, "build_map");
@@ -34,6 +36,27 @@ int main(int argc, char** argv){
   const bool OdomPoseIsAvailable = dataset.PoseIsAvailable();
   MapBuilder map_builder(configs, OdomPoseIsAvailable);
 
+  // ros publisher
+  ros::NodeHandle nh;
+  ros::Publisher odom_pose_pub = nh.advertise<nav_msgs::Path>("/kcc_slam/odom_pose", 10);
+  ros::Publisher kcc_pose_pub = nh.advertise<nav_msgs::Path>("/kcc_slam/kcc_pose", 10);
+  ros::Publisher frame_pose_pub = nh.advertise<nav_msgs::Path>("/kcc_slam/frame_pose", 10);
+
+  ros::Time current_time = ros::Time::now();
+  std::string frame_id = "map";
+
+  nav_msgs::Path odom_pose_msgs, kcc_pose_msga, frame_pose_msgs;
+  odom_pose_msgs.header.stamp = current_time; 
+	odom_pose_msgs.header.frame_id = frame_id; 
+  kcc_pose_msga.header.stamp = current_time; 
+	kcc_pose_msga.header.frame_id = frame_id; 
+  frame_pose_msgs.header.stamp = current_time; 
+	frame_pose_msgs.header.frame_id = frame_id; 
+
+  Aligned<std::vector, Eigen::Vector3d> frame_poses;
+  Eigen::Vector3d new_odom_pose, new_kcc_pose;
+
+  ros::Rate loop_rate(10);
   size_t dataset_length = dataset.GetDatasetLength();
   for(size_t i = 0; i < dataset_length; ++i){
     std::cout << i << std::endl;
@@ -51,6 +74,30 @@ int main(int argc, char** argv){
       dataset.GetPose(pose, i);
     }
     map_builder.AddNewInput(image, pose);
+
+    // publish msgs
+    map_builder.GetOdomPose(new_odom_pose);
+    AddNewPoseToPath(new_odom_pose, odom_pose_msgs, frame_id);
+    map_builder.GetCFPose(new_kcc_pose);
+    AddNewPoseToPath(new_kcc_pose, kcc_pose_msga, frame_id);
+
+    map_builder.GetFramePoses(frame_poses);
+    frame_pose_msgs.poses.clear();
+    for(auto pose : frame_poses){
+      AddNewPoseToPath(pose, frame_pose_msgs, frame_id);
+    }
+
+    std::cout << "new_odom_pose = " << new_odom_pose.transpose() << std::endl;
+    std::cout << "new_kcc_pose = " << new_kcc_pose.transpose() << std::endl;
+    std::cout << "new_frame_pose = " << frame_poses[(frame_poses.size()-1)].transpose() << std::endl;
+
+    odom_pose_pub.publish(odom_pose_msgs); 
+    kcc_pose_pub.publish(kcc_pose_msga); 
+    frame_pose_pub.publish(frame_pose_msgs); 
+    ros::spinOnce(); 
+    loop_rate.sleep(); 
+
+    if(!ros::ok()) break; 
   }
   map_builder.OptimizeMap();
 
