@@ -15,10 +15,12 @@
 #include <nav_msgs/Odometry.h>
 #include <nav_msgs/Path.h>
 #include <visualization_msgs/Marker.h>
+#include <nav_msgs/OccupancyGrid.h>
 
 #include "read_configs.h"
 #include "dataset.h"
 #include "camera.h"
+#include "map_stitcher.h"
 #include "map_builder.h"
 #include "thread_publisher.h"
 #include "visualization.h"
@@ -42,10 +44,14 @@ int main(int argc, char** argv){
   ros::Publisher kcc_pose_pub = nh.advertise<nav_msgs::Path>("/kcc_slam/kcc_pose", 10);
   ros::Publisher frame_pose_pub = nh.advertise<nav_msgs::Path>("/kcc_slam/frame_pose", 10);
 
+  ros::Publisher map_pub = nh.advertise<nav_msgs::OccupancyGrid>("/kcc_slam/occupancy_map", 1);
+
   ros::Time current_time = ros::Time::now();
   std::string frame_id = "map";
 
   nav_msgs::Path odom_pose_msgs, kcc_pose_msga, frame_pose_msgs;
+  nav_msgs::OccupancyGrid occupancy_map_msgs;
+
   odom_pose_msgs.header.stamp = current_time; 
 	odom_pose_msgs.header.frame_id = frame_id; 
   kcc_pose_msga.header.stamp = current_time; 
@@ -53,13 +59,17 @@ int main(int argc, char** argv){
   frame_pose_msgs.header.stamp = current_time; 
 	frame_pose_msgs.header.frame_id = frame_id; 
 
+  occupancy_map_msgs.header.stamp = current_time;
+  occupancy_map_msgs.header.frame_id = frame_id;
+
   Aligned<std::vector, Eigen::Vector3d> frame_poses;
   Eigen::Vector3d new_odom_pose, new_kcc_pose;
 
-  ros::Rate loop_rate(10);
+  ros::Rate loop_rate(3);
   size_t dataset_length = dataset.GetDatasetLength();
   for(size_t i = 0; i < dataset_length; ++i){
     std::cout << i << std::endl;
+    // if(i>5) break;
     if (i%3 != 0){
       continue;
     }
@@ -86,6 +96,12 @@ int main(int argc, char** argv){
     for(auto pose : frame_poses){
       AddNewPoseToPath(pose, frame_pose_msgs, frame_id);
     }
+    
+    OccupancyData map_data = map_builder.GetMapData();
+    occupancy_map_msgs.info.resolution = map_builder.GetMapResolution();
+    ConvertMapToOccupancyMsgs(map_data, occupancy_map_msgs);
+    map_pub.publish(occupancy_map_msgs);
+
 
     std::cout << "new_odom_pose = " << new_odom_pose.transpose() << std::endl;
     std::cout << "new_kcc_pose = " << new_kcc_pose.transpose() << std::endl;
@@ -94,13 +110,13 @@ int main(int argc, char** argv){
     odom_pose_pub.publish(odom_pose_msgs); 
     kcc_pose_pub.publish(kcc_pose_msga); 
     frame_pose_pub.publish(frame_pose_msgs); 
+
     ros::spinOnce(); 
     loop_rate.sleep(); 
-
+   
+ 
     if(!ros::ok()) break; 
   }
   map_builder.OptimizeMap();
-
-
 
 };

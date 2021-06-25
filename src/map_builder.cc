@@ -19,13 +19,15 @@ MapBuilder::MapBuilder(Configs& configs, const bool odom_is_available):
 
   _loop_closure = std::shared_ptr<LoopClosure>(
       new LoopClosure(configs.loop_closure_config, _correlation_flow, _map));
+
+  _map_stitcher = std::shared_ptr<MapStitcher>(new MapStitcher(_camera));
 }
 
 void MapBuilder::AddNewInput(cv::Mat& image, Eigen::Vector3d& odom_pose){
   if(OdomPoseIsAvailable){
-    _current_pose = odom_pose;
+    _current_odom_pose = odom_pose;
   }else{
-    _current_pose << 0.0, 0.0, 0.0;
+    _current_odom_pose << 0.0, 0.0, 0.0;
   }
   cv::Mat undistort_image;
   _camera->UndistortImage(image, undistort_image);
@@ -35,54 +37,39 @@ void MapBuilder::AddNewInput(cv::Mat& image, Eigen::Vector3d& odom_pose){
   
   if(!_init){
     Initialize();
+    _map_stitcher->InsertFrame(_current_frame, undistort_image);
     UpdateIntermedium();
     return;
   }
   
   Eigen::Vector3d relative_pose;
   bool good_tracking = Tracking(relative_pose);
-  if((!good_tracking) && (!OdomPoseIsAvailable)){
-    return;
+  if(good_tracking){
+    _current_cf_pose = ComputeAbsolutePose(_last_cf_pose, relative_pose);
+    _camera->ConvertImagePlanePoseToCamera(_current_cf_pose, _current_cf_real_pose);
+    Eigen::Vector3d relative_cf_real_pose = ComputeRelativePose(_last_cf_real_pose, _current_cf_real_pose);
+    Eigen::Matrix3d info = Eigen::Matrix3d::Identity();
+    AddCFEdgeToMap(relative_cf_real_pose, _last_frame->GetFrameId(), 
+    _current_frame->GetFrameId(), _edge_id++, info);
+  }else{
+    if(!OdomPoseIsAvailable) return;
+    _camera->ConvertRobotPoseToCamera(_current_cf_real_pose, _current_odom_pose);
+    _camera->ConvertCameraPoseToImagePlane(_current_cf_pose, _current_cf_real_pose);
   }
   
-
-  _current_cf_pose = ComputeAbsolutePose(_last_cf_pose, relative_pose);
-  // std::cout << "_last_cf_pose = " << _last_cf_pose.transpose() << std::endl;
-  // std::cout << "relative_pose = " << relative_pose.transpose() << std::endl;
-  // std::cout << "_current_cf_pose = " << _current_cf_pose.transpose() << std::endl;
-  _camera->ConvertImagePlanePoseToCamera(_current_cf_pose, _current_cf_real_pose);
-  // std::cout << "_current_cf_real_pose = " << _current_cf_real_pose.transpose() << std::endl;
-  // std::cout << "_last_cf_real_pose = " << _last_cf_real_pose.transpose() << std::endl;
-  Eigen::Vector3d relative_cf_real_pose = ComputeRelativePose(_last_cf_real_pose, _current_cf_real_pose);
-  // std::cout << "relative_cf_real_pose = " << relative_cf_real_pose.transpose() << std::endl;
-  
-  // debug
-  // Eigen::Vector3d last_cf_robot_pose, current_cf_robot_pose;
-  // _camera->ConvertCameraPoseToRobot(_last_cf_real_pose, last_cf_robot_pose);
-  // _camera->ConvertCameraPoseToRobot(_current_cf_real_pose, current_cf_robot_pose);
-  // Eigen::Vector3d relative_cf_robot_pose = ComputeRelativePose(last_cf_robot_pose, current_cf_robot_pose);
-  // std::cout << "last_cf_robot_pose = " << last_cf_robot_pose.transpose() << std::endl;
-  // std::cout << "current_cf_robot_pose = " << current_cf_robot_pose.transpose() << std::endl;
-  // std::cout << "relative_cf_robot_pose = " << relative_cf_robot_pose.transpose() << std::endl;
-  ////////
-
-  Eigen::Matrix3d info = Eigen::Matrix3d::Identity();
-  AddCFEdgeToMap(relative_cf_real_pose, _last_frame->GetFrameId(), 
-      _current_frame->GetFrameId(), _edge_id++, info);
   AddOdomEdgeToMap();
-
-  // update current pose
-  if(!OdomPoseIsAvailable) _current_pose = _current_cf_real_pose;
-  _current_frame->SetPose(_current_pose);
+  UpdateCurrentPose();
+  SetCurrentFramePose();
   _map->AddFrame(_current_frame);
-
-  
+  SetFrameDistance();
+  _map_stitcher->InsertFrame(_current_frame, undistort_image);
 
   bool loop_found = FindLoopClosure();
   if(!loop_found){
     if(_loop_matches.size() >= 2){
       AddLoopEdges();
       OptimizeMap();
+      _map_stitcher->RecomputeOccupancy();
     }
     _loop_matches.clear();
   }
@@ -100,14 +87,21 @@ void MapBuilder::ConstructFrame(){
       new Frame(_frame_id++, _image_array, _fft_result, _fft_polar));
 }
 
-bool MapBuilder::Initialize(){
+void MapBuilder::SetCurrentFramePose(){
   _current_frame->SetPose(_current_pose);
-  _map->AddFrame(_current_frame);
-  _init = true;
+}
+
+bool MapBuilder::Initialize(){
   _current_cf_pose << 0.0, 0.0, 0.0;
   _camera->ConvertImagePlanePoseToCamera(_current_cf_pose, _current_cf_real_pose);
+  _camera->ConvertCameraPoseToRobot(_current_cf_real_pose, _current_pose);
+  _baseframe_odom_pose = _current_odom_pose;
+  SetCurrentFramePose();
+  _map->AddFrame(_current_frame);
   _distance = 0;
   _map->SetFrameDistance(_current_frame, _distance);
+  _init = true;
+  _last_lost = false;
   return true;
 }
 
@@ -115,15 +109,29 @@ void MapBuilder::UpdateIntermedium(){
   _last_frame = _current_frame;
   _last_cf_pose = _current_cf_pose;
   _last_cf_real_pose = _current_cf_real_pose;
+  _last_odom_pose = _current_odom_pose;
   _last_pose = _current_pose;
   _last_fft_result = _fft_result;
   _last_fft_polar = _fft_polar;
 }
 
+void MapBuilder::UpdateCurrentPose(){
+  Eigen::Vector3d last_robot_pose_from_cf, current_robot_pose_from_cf;
+  _camera->ConvertImagePlanePoseToRobot(_last_cf_pose, last_robot_pose_from_cf);
+  _camera->ConvertImagePlanePoseToRobot(_current_cf_pose, current_robot_pose_from_cf);
+  Eigen::Vector3d relativate_pose_from_cf = ComputeRelativePose(last_robot_pose_from_cf, current_robot_pose_from_cf);
+  Eigen::Vector3d relative_odom_pose = ComputeRelativePose(_last_odom_pose, _current_odom_pose);
+
+  Eigen::Vector3d relative_pose = relativate_pose_from_cf;
+  relative_pose(2) = relative_odom_pose(2);
+  _current_pose = ComputeAbsolutePose(_last_pose, relative_pose);
+  // _camera->ConvertImagePlanePoseToRobot(_current_cf_pose, _current_pose);
+}
+
 bool MapBuilder::Tracking(Eigen::Vector3d& relative_pose){
   Eigen::Vector3d response = _correlation_flow->ComputePose(
       _last_fft_result, _fft_result, _last_fft_polar, _fft_polar, relative_pose);
-  // std::cout << "cf_edge response = " << response.transpose() << std::endl;
+  std::cout << "cf_edge response = " << response.transpose() << std::endl;
   return true;
 }
 
@@ -270,9 +278,7 @@ bool MapBuilder::OptimizeMap(){
 // for visualization
 bool MapBuilder::GetOdomPose(Eigen::Vector3d& pose){
   if(!OdomPoseIsAvailable) return false;
-  Eigen::Vector3d baseframe_pose;
-  _map->GetBaseframe()->GetPose(baseframe_pose);
-  pose = ComputeRelativePose(baseframe_pose, _current_pose);
+  pose = ComputeRelativePose(_baseframe_odom_pose, _current_odom_pose);
   return true;
 }
 
@@ -299,4 +305,12 @@ bool MapBuilder::GetFramePoses(Aligned<std::vector, Eigen::Vector3d>& poses){
   }
 
   return true;
+}
+
+double MapBuilder::GetMapResolution(){
+  return _camera->GetLengthOfPixel();
+}
+
+OccupancyData& MapBuilder::GetMapData(){
+  return _map_stitcher->GetOccupancyData();
 }

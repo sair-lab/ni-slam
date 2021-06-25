@@ -54,8 +54,8 @@ Eigen::Vector3d CorrelationFlow::ComputePose(const Eigen::ArrayXXcf& last_fft_re
     info[0] = info_trans; pose[0] = trans[1];
     info[1] = info_trans; pose[1] = trans[0];
     info[2] = info_rots;  pose[2] = rots[0]*(2*3.145926/cfg.rotation_divisor);
-    // std::cout<<"X, Y, \u0398: "<<pose.transpose()<<std::endl;
-    // std::cout<<"Info: "<<info.transpose()<<std::endl;
+    std::cout<<"X, Y, \u0398: "<<pose.transpose()<<std::endl;
+    std::cout<<"Info: "<<info.transpose()<<std::endl;
     return info;
 }
 

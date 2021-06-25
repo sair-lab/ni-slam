@@ -22,8 +22,9 @@ public:
   double GetHeight();
   bool HeightIsAccurate();
   void GetExtrinsics(Eigen::Matrix3d& extrinsics);
+  double GetLengthOfPixel();
 
-  // image plane: pixel plane, 
+  // image plane: pixel plane, image center is the origin 
   // Camera: normalized plane, 
   // Robot: robot body coordinate system.
   bool ConvertImagePlanePoseToCamera(Eigen::Vector3d& image_plane_pose, Eigen::Vector3d& camera_pose);

@@ -61,6 +61,7 @@ LoopClosureResult LoopClosure::FindLoopClosure(FramePtr& current_frame, std::vec
       result.response = response;
       result.loop_frame = frame;
       result.relative_pose = relative_pose;
+      std::cout << "FindLoopClosure, relative_pose = " << relative_pose.transpose() << std::endl;
     }
   }
 
@@ -68,5 +69,13 @@ LoopClosureResult LoopClosure::FindLoopClosure(FramePtr& current_frame, std::vec
   bool c2 = (result.response(2) > _loop_thr.angle_response_thr);
 
   result.found = (c1 && c2);
+  if(result.response.sum() > 0){
+    std::cout << "FindLoopClosure, current_frame = " << current_frame->GetFrameId() 
+                << "  loop_frame = " << result.loop_frame->GetFrameId() << std::endl;
+    std::cout << "FindLoopClosure, rtk pose = " << result.relative_pose.transpose() << std::endl;
+  }
+ 
+  std::cout << "FindLoopClosure, result.response(0) = " << result.response(0) << "  result.response(2) = " << result.response(2) << std::endl;
+  std::cout << "FindLoopClosure, c1 = " << c1 << "  c2 = " << c2 <<"  result.found = "<< result.found << std::endl;
   return result;
 }

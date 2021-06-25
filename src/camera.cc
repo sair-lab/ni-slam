@@ -87,6 +87,13 @@ void Camera::GetExtrinsics(Eigen::Matrix3d& extrinsics){
   extrinsics = _extrinsics;
 }
 
+double Camera::GetLengthOfPixel(){
+  Eigen::Vector3d pixel(1.0, 1.0, 0.0);
+  Eigen::Vector3d real;
+  ConvertImagePlanePoseToRobot(pixel, real);
+  return (real(0) + real(1)) / 2;
+}
+
 bool Camera::ConvertImagePlanePoseToCamera(
     Eigen::Vector3d& image_plane_pose, Eigen::Vector3d& camera_pose){
   double u = image_plane_pose(0);
@@ -94,9 +101,9 @@ bool Camera::ConvertImagePlanePoseToCamera(
   double angle = image_plane_pose(2);
 
   double fx = _new_K.at<double>(0, 0);
-  double cx = _new_K.at<double>(0, 2);
+  // double cx = _new_K.at<double>(0, 2);
   double fy = _new_K.at<double>(1, 1);
-  double cy = _new_K.at<double>(1, 2);
+  // double cy = _new_K.at<double>(1, 2);
 
   double x = u / fx;
   double y = v / fy;
@@ -110,12 +117,12 @@ bool Camera::ConvertCameraPoseToImagePlane(
     Eigen::Vector3d& image_plane_pose, Eigen::Vector3d& camera_pose){
   double x = camera_pose(0);
   double y = camera_pose(1);
-  double angle = camera_pose(1);
+  double angle = camera_pose(2);
 
   double fx = _new_K.at<double>(0, 0);
-  double cx = _new_K.at<double>(0, 2);
+  // double cx = _new_K.at<double>(0, 2);
   double fy = _new_K.at<double>(1, 1);
-  double cy = _new_K.at<double>(1, 2); 
+  // double cy = _new_K.at<double>(1, 2); 
 
   double u = fx * x;
   double v = fy * y;
