@@ -51,20 +51,39 @@ void CorrelationFlow::ComputeIntermedium(const Eigen::ArrayXXf& image, Eigen::Ar
     Eigen::ArrayXXf power = IFFT(fft_result.abs());
     auto high_power = RemoveZeroFrequency(power);
     fft_polar = FFT(polar(fftshift(high_power)));
-    // ShowArray(power_shift, "test", 10);
 }
 
 Eigen::Vector3d CorrelationFlow::ComputePose(const Eigen::ArrayXXcf& last_fft_result, const Eigen::ArrayXXcf& fft_result,
                                    const Eigen::ArrayXXcf& last_fft_polar, const Eigen::ArrayXXcf& fft_polar,
                                    Eigen::Vector3d& pose)
 {
-    Eigen::Vector2d trans, rots; Eigen::Vector3d info;
-    auto info_trans = EstimateTrans(last_fft_result, fft_result, target_fft, cfg.height, cfg.width, trans);
+    Eigen::Vector2d trans, trans_orig, trans_veri, rots; Eigen::Vector3d info; float info_trans;
     auto info_rots = EstimateTrans(last_fft_polar, fft_polar, target_rotation_fft, cfg.rotation_divisor, cfg.width, rots);
+    float degree = rots[0]*(2.0/cfg.rotation_divisor)*180;
+
+    auto fft_rot_orig = FFT(RotateArray(IFFT(fft_result), -degree));
+    auto fft_rot_veri = FFT(RotateArray(IFFT(fft_result), -degree+180));
+
+    float info_trans_orig = EstimateTrans(last_fft_result, fft_rot_orig, target_fft, cfg.height, cfg.width, trans_orig);
+    float info_trans_veri = EstimateTrans(last_fft_result, fft_rot_veri, target_fft, cfg.height, cfg.width, trans_veri);
+
+    ShowArray(IFFT(last_fft_result), "last");
+    if (info_trans_orig > info_trans_veri)
+        {
+            info_trans = info_trans_orig;
+            trans = trans_orig;
+            degree = degree;
+        }
+    else{
+            info_trans = info_trans_veri;
+            trans = trans_veri;
+            degree = degree + 180;
+        }
+
     info[0] = info_trans; pose[0] = trans[0];
     info[1] = info_trans; pose[1] = trans[1];
-    info[2] = info_rots;  pose[2] = rots[0]*(2*M_PI/cfg.rotation_divisor);
-    std::cout<<"X, Y, \u0398: "<<pose.transpose()<<"="<< rots[0]*(2.0/cfg.rotation_divisor)*180<<std::endl;
+    info[2] = info_rots;  pose[2] = degree/180*M_PI;
+    std::cout<<"X, Y, \u0398: "<<pose.transpose()<<"="<<degree<<std::endl;
     std::cout<<"Info: "<<info.transpose()<<std::endl;
     return info;
 }
