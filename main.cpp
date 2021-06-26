@@ -61,6 +61,15 @@ int main(int argc, char** argv){
 
   occupancy_map_msgs.header.stamp = current_time;
   occupancy_map_msgs.header.frame_id = frame_id;
+  Eigen::Matrix<double, 7, 1> map_origin;
+  map_builder.GetOccupancyMapOrigin(map_origin);
+  occupancy_map_msgs.info.origin.orientation.w = map_origin(0, 0);
+  occupancy_map_msgs.info.origin.orientation.x = map_origin(1, 0);
+  occupancy_map_msgs.info.origin.orientation.y = map_origin(2, 0);
+  occupancy_map_msgs.info.origin.orientation.z = map_origin(3, 0);
+  occupancy_map_msgs.info.origin.position.x = map_origin(4, 0);
+  occupancy_map_msgs.info.origin.position.y = map_origin(5, 0);
+  occupancy_map_msgs.info.origin.position.z = map_origin(6, 0);
 
   Aligned<std::vector, Eigen::Vector3d> frame_poses;
   Eigen::Vector3d new_odom_pose, new_kcc_pose;

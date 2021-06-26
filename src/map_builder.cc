@@ -123,7 +123,7 @@ void MapBuilder::UpdateCurrentPose(){
   Eigen::Vector3d relative_odom_pose = ComputeRelativePose(_last_odom_pose, _current_odom_pose);
 
   Eigen::Vector3d relative_pose = relativate_pose_from_cf;
-  relative_pose(2) = relative_odom_pose(2);
+  // relative_pose(2) = relative_odom_pose(2);
   _current_pose = ComputeAbsolutePose(_last_pose, relative_pose);
   // _camera->ConvertImagePlanePoseToRobot(_current_cf_pose, _current_pose);
 }
@@ -304,6 +304,28 @@ bool MapBuilder::GetFramePoses(Aligned<std::vector, Eigen::Vector3d>& poses){
     poses.emplace_back(pose);
   }
 
+  return true;
+}
+
+bool MapBuilder::GetOccupancyMapOrigin(Eigen::Matrix<double, 7, 1>& origin){
+  Eigen::Matrix3d Rbc;
+  _camera->GetExtrinsics(Rbc);
+  Eigen::Quaterniond qbc(Rbc);
+  origin(0, 0) = qbc.w();
+  origin(1, 0) = qbc.x();
+  origin(2, 0) = qbc.y();
+  origin(3, 0) = qbc.z();
+
+  double image_width = _camera->GetImageWidth();
+  double image_height = _camera->GetImageHeight();
+  double height = _camera->GetHeight();
+  Eigen::Vector3d image_center, camera_center;
+  image_center << -image_width / 2, -image_height / 2, 0;
+  _camera->ConvertImagePlanePoseToCamera(image_center, camera_center);
+
+  origin(4, 0) = camera_center(0) * height;
+  origin(5, 0) = camera_center(1) * height;
+  origin(6, 0) = 0;
   return true;
 }
 

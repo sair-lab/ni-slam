@@ -33,6 +33,7 @@ public:
   bool GetOdomPose(Eigen::Vector3d& pose);  // odom pose in baseframe
   bool GetCFPose(Eigen::Vector3d& pose);    // rlt robot pose 
   bool GetFramePoses(Aligned<std::vector, Eigen::Vector3d>& poses);
+  bool GetOccupancyMapOrigin(Eigen::Matrix<double, 7, 1>& origin);  // [qw, qx, qy, qz, x, y, z]
   double GetMapResolution();
   OccupancyData& GetMapData();
 

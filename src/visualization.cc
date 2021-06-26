@@ -49,15 +49,13 @@ void ConvertMapToOccupancyMsgs(OccupancyData& map, nav_msgs::OccupancyGrid& msgs
 
   msgs.info.width = max_x - min_x + 1 + 50;
   msgs.info.height = max_y - min_y + 1 + 50;
-  // msgs.info.origin.position.x = min_x;
-  // msgs.info.origin.position.y = min_y;
-  msgs.info.origin.position.x = 0;
-  msgs.info.origin.position.y = 0;
-  msgs.info.origin.position.z = 0;
-  msgs.info.origin.orientation.x = 0;
-  msgs.info.origin.orientation.y = 0;
-  msgs.info.origin.orientation.z = 0;
-  msgs.info.origin.orientation.w = 1;
+  // msgs.info.origin.position.x = 0;
+  // msgs.info.origin.position.y = 0;
+  // msgs.info.origin.position.z = 0;
+  // msgs.info.origin.orientation.x = 0;
+  // msgs.info.origin.orientation.y = 0;
+  // msgs.info.origin.orientation.z = 0;
+  // msgs.info.origin.orientation.w = 1;
 
   // fill in map_data
   int num_grids = msgs.info.width * msgs.info.height;
@@ -70,10 +68,6 @@ void ConvertMapToOccupancyMsgs(OccupancyData& map, nav_msgs::OccupancyGrid& msgs
     int pixel = std::accumulate(kv.second.begin(), kv.second.end(), 0) / kv.second.size();
     pixel = std::min(100, std::max(0, pixel));
 
-    // std::cout << "min_x = " << min_x << "  max_x = " << max_x << "  min_y = " 
-    //           << min_y <<  "  max_y = " << max_y << " px = " << kv.first.x << " py = " << kv.first.y << std::endl;
-    // std::cout << "width = " << msgs.info.width << "  height = " << msgs.info.height 
-    //           << "  x = " << x << " y = " << y << " idx = " << idx << std::endl;
     data[idx] = 100 - static_cast<int8_t>(pixel);
 
   }
