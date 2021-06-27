@@ -12,10 +12,12 @@ void MapStitcher::InsertFrame(FramePtr frame, cv::Mat& image){
   cv::cv2eigen(norm_image, matrix);
   _raw_images[frame] = matrix;
 
-  AddImageToOccupancy(frame);
+  LocationSet update_locations;
+  AddImageToOccupancy(frame, update_locations);
+  UpdateMap(update_locations);
 }
 
-void MapStitcher::AddImageToOccupancy(FramePtr frame){
+void MapStitcher::AddImageToOccupancy(FramePtr frame, LocationSet& locations){
   Eigen::MatrixXi& data = _raw_images[frame];
 
   // TODO: need pose of image plane, to change
@@ -49,6 +51,7 @@ void MapStitcher::AddImageToOccupancy(FramePtr frame){
       int y = static_cast<int>((Wy(i) + Hy(j)));
       GridLocation grid_location(x, y);
       _occupancy_data[grid_location].emplace_back(data(j, i));
+      locations.insert(grid_location);
     }
   }
 
@@ -57,6 +60,7 @@ void MapStitcher::AddImageToOccupancy(FramePtr frame){
 
 void MapStitcher::RecomputeOccupancy(){
   _occupancy_data.clear();
+  _occupancy_map.clear();
   for(auto kv : _raw_images){
     AddImageToOccupancy(kv.first);
   }
@@ -64,4 +68,10 @@ void MapStitcher::RecomputeOccupancy(){
 
 OccupancyData& MapStitcher::GetOccupancyData(){
   return _occupancy_data;
+}
+
+void MapStitcher::UpdateMap(LocationSet& locations){
+  for(auto location : locations){
+    _occupancy_map[location] = td::accumulate(kv.second.begin(), kv.second.end(), 0) / kv.second.size();
+  }
 }
